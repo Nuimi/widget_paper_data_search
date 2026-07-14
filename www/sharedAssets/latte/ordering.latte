@@ -1,0 +1,50 @@
+{varType array $heads}
+{varType string $ajax}
+{varType int $page}
+
+<thead>
+    <tr>
+        {foreach $heads as $key => $value}
+            {if empty($value)}
+                <th>
+                    {$key|noescape}
+                </th>
+            {else}
+                <th data-change-order="{$value}" data-change-order-direction="{\Classes\Ordering::getOrder($value)}" class="order-tr">
+                    {$key|noescape}
+                    &nbsp;
+                    <span n:class="fa, \Classes\Ordering::getOrder($value) == 'asc' ? fa-arrow-down-z-a : fa-arrow-down-a-z, \Classes\Ordering::isset($value) == false ? hidden"></span>
+                </th>
+            {/if}
+        {/foreach}
+    </tr>
+</thead>
+
+<script>
+    $(document).on('click', '[data-change-order]', function()
+        {
+            showLoaderPage();
+            $.ajax({
+                url: {\Classes\StaticFunctions::getCurrentURL()} + '/ajax/' + {$ajax} + '/',
+                method: 'POST',
+                data: {
+                    ajax: {$ajax},
+                    page: {$page},
+                    direction: $(this).data('change-order-direction'),
+                    order: $(this).data('change-order'),
+                    csrf: {\Classes\StaticFunctions::getCSRFToken()},
+                    showAll: {\Classes\Filters::getShowAll()},
+                },
+                success: function(response) {
+                    if (response.success)
+                    {
+                        $('#' + {$ajax}).html(response.data);
+                        hideLoaderPage();
+                    } else {
+                        createAlert('Spracování požadavku', response.message, 'danger')
+                    }
+                }
+            });
+        }
+    );
+</script>

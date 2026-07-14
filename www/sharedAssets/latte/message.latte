@@ -1,0 +1,100 @@
+{varType array $messages}
+<style>
+    #pageMessages {
+        position: fixed;
+        top: 70px;
+        right: 15px;
+        width: 30%;
+    }
+    .alertMessage {
+        padding: 10px;
+        position: relative;
+        border-radius: 25px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .alertMessage .close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 1em;
+    }
+    .alertMessage .fa {
+        margin-right: 0.3em;
+    }
+</style>
+
+<div id="pageMessages">
+
+</div>
+
+<script>
+    function createAlert(title, summary, severity) {
+        let iconMap = {
+            info: "fa fa-info-circle",
+            success: "fa fa-thumbs-up",
+            warning: "fa fa-exclamation-triangle",
+            danger: "fa ffa fa-exclamation-circle"
+        };
+
+        let iconAdded = false;
+
+        let alertClasses = ["alertMessage", "animated", "flipInX"];
+        alertClasses.push("alert-" + severity.toLowerCase());
+        alertClasses.push("alert-dismissible");
+
+        let msgIcon = $("<i />", {
+            "class": iconMap[severity]
+        });
+
+        let msg = $("<div />", {
+            "class": alertClasses.join(" ")
+        });
+
+        if (title) {
+            let msgTitle = $("<h4 />", {
+                html: title
+            }).appendTo(msg);
+
+            if(!iconAdded){
+                msgTitle.prepend(msgIcon);
+                iconAdded = true;
+            }
+        }
+
+        if (summary) {
+            let msgSummary = $("<strong />", {
+                html: summary
+            }).appendTo(msg);
+
+            if(!iconAdded){
+                msgSummary.prepend(msgIcon);
+                iconAdded = true;
+            }
+        }
+
+
+
+        $("<span />", {
+            "class": "close",
+            "data-dismiss": "alert",
+            html: "<i class='fa fa-times-circle'></i>"
+        }).appendTo(msg);
+
+
+        $('#pageMessages').prepend(msg);
+
+        setTimeout(function(){
+            msg.addClass("flipOutX");
+            setTimeout(function(){
+                msg.remove();
+            },1000);
+        }, 5000);
+    }
+
+    {if $messages}
+        {foreach $messages as $message}
+        createAlert({$message['title']},{$message['message']},{$message['severity']});
+        {/foreach}
+    {/if}
+</script>

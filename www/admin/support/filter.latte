@@ -1,0 +1,169 @@
+{varType string $page}
+{varType string $ajax}
+{varType string $search}
+{varType array $workPlaces}
+{varType array $providers}
+{varType array $certNames}
+
+<form class="form-inline justify-content-center" n:if="!in_array(\Classes\UserData::getPermission(), [Classes\User\Manager::P_EMPLOYEE])" id="f_search">
+    {if $ajax != 'certificateTable'}
+        <div class="form-group  mr-sm-3">
+            <small class="small-tooltip">&nbsp;</small>
+            <label class="sr-only" for="f_searchString">Jméno/Osobní číslo</label>
+            <input type="text" class="form-control" id="f_searchString" placeholder="Jméno/Osobní číslo"
+                    n:attr="value => isset($search) && $search  ? $search: ''">
+        </div>
+
+        {if !in_array(\Classes\UserData::getPermission(), [\Classes\User\Manager::P_LEADER])}
+            <div class="form-group mr-sm-3">
+                <small class="small-tooltip">&nbsp;</small>
+                <label class="sr-only" for="f_work_places">Pracoviště</label>
+                <select id="f_work_places" data-placeholder="Pracoviště" class="form-control"  data-width="300">
+                    <option value="0">Pracoviště</option>
+                    {foreach $workPlaces as $workData}
+                        {var \Classes\WorkPlace\WorkPlace $workPlace = $workData}
+                        <option n:attr="value: $workPlace->getId()">{$workPlace->getName()}</option>
+                    {/foreach}
+                </select>
+            </div>
+        {/if}
+    {/if}
+
+    {if $ajax == 'dashboardTable' ||  $ajax == 'certificateTable'}
+
+        <div class="form-group mr-sm-3">
+            <small class="small-tooltip">&nbsp;</small>
+            <label class="sr-only" for="f_cert">Certifikát</label>
+            <select id="f_cert" data-placeholder="Certifikát" class="form-control"  data-width="200">
+                <option value="0">Certifikát</option>
+                {foreach $certNames as $cert}
+                    <option n:attr="value: $cert['name']">{$cert['name']}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="form-group mr-sm-3">
+            <small class="small-tooltip">&nbsp;</small>
+            <label class="sr-only" for="f_provider">Provider</label>
+            <select id="f_provider" data-placeholder="Provider" class="form-control" data-width="200">
+                <option value="0">Provider</option>
+                {foreach $providers as $provider}
+                    <option n:attr="value: $provider['provider']">{$provider['provider']}</option>
+                {/foreach}
+            </select>
+        </div>
+    {/if}
+
+    {if $ajax == 'dashboardTable'}
+        <div class="form-group">
+            <small class="small-tooltip">
+                Od
+            </small>
+            <label class="sr-only" for="f_from">Od</label>
+            <input type="date" class="form-control" id="f_from" name="from" title="od" n:attr="value => isset($search) && $search  ? $search: ''">
+        </div>
+        <div class="form-group">
+            <small class="small-tooltip">
+                Do
+            </small>
+            <label class="sr-only" for="f_to">Do</label>
+            <input type="date" class="form-control" id="f_to" name="to" title="od" n:attr="value => isset($search) && $search  ? $search: ''">
+        </div>
+    {/if}
+    <div class="form-group">
+        <small class="small-tooltip">&nbsp;</small>
+        <button type="button" class="btn btn-primary mb-2 ml-sm-2" data-search id="submit">Vyhledat</button>
+    </div>
+    <div class="form-group">
+        <small class="small-tooltip">&nbsp;</small>
+        <button type="button" class="btn btn-danger mb-2 hidden" id="deleteFilters" title="Smazat filtry" >
+            <span class="fa fa-x"></span>
+        </button>
+    </div>
+</form>
+<br>
+
+<script>
+
+    $(document).on('click', '[data-search]', function()
+        {
+            sendData();
+        }
+    );
+
+    $(document).on('click', '#deleteFilters', function()
+        {
+            location.reload();
+        }
+    );
+
+    $(document).on('keyup', '#f_searchString', function(e)
+        {
+            if (e.key === 'Enter')
+            {
+                e.preventDefault();
+                sendData();
+            }
+
+            if ($(this).val() !== '')
+            {
+                $('#deleteFilters').removeClass('hidden');
+            } else {
+                $('#deleteFilters').addClass('hidden');
+            }
+        }
+    );
+
+    $('#f_search').on('submit', function(e)
+        {
+            e.preventDefault();
+        }
+    );
+
+    function sendData()
+    {
+        $.get({\Classes\StaticFunctions::getCurrentURL()} + '/ajax/' + {$ajax} + '/',
+            {
+                search : $('#f_searchString').val(),
+                workPlace : $('#f_work_places').val(),
+                from : $('#f_from').val(),
+                to : $('#f_to').val(),
+                provider : $('#f_provider').val(),
+                cert : $('#f_cert').val(),
+                page: {$page ?? 1},
+                order: '',
+                direction: '',
+                csrf: {\Classes\StaticFunctions::getCSRFToken()}
+            },
+            function (data)
+            {
+                $('#' + {$ajax}).html(data['data']);
+                $('#deleteFilters').removeClass('hidden');
+            }
+        );
+    }
+
+    $(function()
+    {
+        $('#f_work_places').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            closeOnSelect: !$(this).attr('multiple'),
+            dropdownParent: $('#f_search')
+        });
+        $('#f_provider').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            closeOnSelect: !$(this).attr('multiple'),
+            dropdownParent: $('#f_search')
+        });
+        $('#f_cert').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            closeOnSelect: !$(this).attr('multiple'),
+            dropdownParent: $('#f_search')
+        });
+    });
+</script>

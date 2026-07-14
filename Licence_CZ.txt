@@ -1,0 +1,54 @@
+WOS Widget / Q-Quartile Finder
+Licenční podmínky
+
+Copyright (c) 2026 Nuimi a přispěvatelé repozitáře.
+Všechna práva vyhrazena.
+
+1. Povaha licence
+
+Tento projekt je poskytován jako proprietární software. Pokud není v samostatné písemné dohodě uvedeno jinak, získáním zdrojových kódů, binárních souborů nebo související dokumentace nevzniká žádné právo projekt veřejně šířit, prodávat, sublicencovat nebo zveřejňovat.
+
+2. Povolené použití
+
+Oprávněný vlastník projektu a jím výslovně pověřené osoby mohou software používat pro:
+
+- interní provoz
+- vývoj, servis a údržbu
+- lokální testování
+- nasazení v rámci schválené infrastruktury
+
+3. Omezení
+
+Bez předchozího písemného souhlasu nositele autorských práv není dovoleno:
+
+- poskytovat zdrojové kódy nebo balíčky třetím stranám
+- projekt dále prodávat, pronajímat nebo sublicencovat
+- publikovat upravené nebo neupravené kopie ve veřejných repozitářích
+- odstranit nebo měnit autorská a licenční upozornění
+
+4. Úpravy a odvozená díla
+
+Úpravy zdrojového kódu jsou dovoleny pouze pro interní potřeby vlastníka projektu nebo osob, které k tomu byly prokazatelně pověřeny. Všechna taková upravená díla zůstávají součástí tohoto proprietárního režimu, pokud písemná dohoda neurčí jinak.
+
+5. Knihovny a assety třetích stran
+
+Tento projekt může obsahovat knihovny, fonty, obrázky nebo jiné komponenty třetích stran. Tyto části zůstávají licencovány podle svých původních licencí a tato licence se na ně nevztahuje v rozsahu, v jakém to jejich licence neumožňuje.
+
+Pro orientaci zkontrolujte zejména:
+
+- `composer.json`
+- `package.json`
+- licenční soubory dodané uvnitř `vendor/`
+- assety a fonty ve složce `www/`
+
+6. Vyloučení záruk
+
+Software je poskytován "tak jak je", bez jakékoliv výslovné nebo předpokládané záruky, včetně záruk obchodovatelnosti, vhodnosti pro konkrétní účel nebo neporušení práv třetích stran.
+
+7. Omezení odpovědnosti
+
+Autor ani přispěvatelé nenesou odpovědnost za přímé, nepřímé, následné, zvláštní ani nahodilé škody vzniklé z použití nebo nemožnosti použití tohoto software, a to ani v případě, že byli na možnost takových škod upozorněni.
+
+8. Změna licence
+
+Nositel autorských práv si vyhrazuje právo tento licenční text kdykoliv nahradit nebo doplnit jinou licencí pro budoucí verze projektu.

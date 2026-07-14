@@ -1,0 +1,458 @@
+{varType int $modal}
+{varType array $eduActivities}
+{varType array $workPlaces}
+
+{ifset $modal}
+    {switch $modal}
+
+        {case \Classes\DefaultClass::MODAL_USER}
+            <div class="modal fade" id="modal_addUser" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h5 class="modal-title margin-lr-auto">Přidání uživatele</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form class="needs-validation" novalidate
+                                  action="{\Classes\StaticFunctions::getCurrentURL()}/user/add"
+                                  method="post">
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <label for="m_{\Classes\User\Manager::USER_NAME}">Uživatelské jméno</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\User\Manager::USER_NAME}" name="{\Classes\User\Manager::USER_NAME}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="m_{\Classes\User\Manager::NUMBER}">Osobní číslo</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\User\Manager::NUMBER}" name="{\Classes\User\Manager::NUMBER}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label for="m_email">Email</label>
+                                        <input type="email" class="form-control" id="m_email" name="email" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                </div>
+{*                                <div class="form-row">*}
+{*                                    <div class="form-group col-md-6">*}
+{*                                        <label for="m_password">Heslo</label>*}
+{*                                        <input type="password" class="form-control" id="m_password" name="password" required>*}
+{*                                        <div class="valid-feedback">*}
+{*                                            Vše vypadá v pořádku*}
+{*                                        </div>*}
+{*                                        <div class="invalid-feedback">*}
+{*                                            Něco je špatně. Prosím vyplňte pole správně*}
+{*                                        </div>*}
+{*                                    </div>*}
+{*                                    <div class="form-group col-md-6">*}
+{*                                        <label for="m_password1">Heslo znovu</label>*}
+{*                                        <input type="password" class="form-control" id="m_password1" name="password1" required>*}
+{*                                        <div class="valid-feedback">*}
+{*                                            Vše vypadá v pořádku*}
+{*                                        </div>*}
+{*                                        <div class="invalid-feedback">*}
+{*                                            Něco je špatně. Prosím vyplňte pole správně*}
+{*                                        </div>*}
+{*                                    </div>*}
+{*                                </div>*}
+                                <button class="btn btn-outline-success" type="submit">
+                                    Přidat
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {case \Classes\DefaultClass::MODAL_CERTIFICATE}
+            <div class="modal fade" id="modal_addTraining" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h5 class="modal-title margin-lr-auto">Přidání vzdělávání</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form class="needs-validation" novalidate
+                                  action="{\Classes\StaticFunctions::getCurrentURL()}/employeeTraining/eduActivityAdd"
+                                  method="post">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="m_{\Classes\EduActivity\Manager::NAME}">Název</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\EduActivity\Manager::NAME}" name="{\Classes\EduActivity\Manager::NAME}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="m_{\Classes\EduActivity\Manager::PROVIDER}">Poskytovatel</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\EduActivity\Manager::PROVIDER}" name="{\Classes\EduActivity\Manager::PROVIDER}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\EduActivity\Manager::SCOPE}">Rozsah</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\EduActivity\Manager::SCOPE}" name="{\Classes\EduActivity\Manager::SCOPE}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\EduActivity\Manager::PRICE}">Cena</label>
+                                        <input type="number" class="form-control" id="m_{\Classes\EduActivity\Manager::PRICE}" name="{\Classes\EduActivity\Manager::PRICE}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <div class="custom-control custom-switch" style="margin-top: 30px">
+                                            <input type="checkbox" class="custom-control-input" id="m_{\Classes\EduActivity\Manager::CERTIFICATION}"  name="{\Classes\EduActivity\Manager::CERTIFICATION}">
+                                            <label class="custom-control-label" for="m_{\Classes\EduActivity\Manager::CERTIFICATION}">Poskytne certifikaci</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="m_{\Classes\EduActivity\Manager::DES}">Popis</label>
+                                    <textarea class="form-control" id="m_{\Classes\EduActivity\Manager::DES}" name="{\Classes\EduActivity\Manager::DES}" rows="3"
+                                              required></textarea>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-success" type="submit">
+                                    Přidat
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {case \Classes\DefaultClass::MODAL_EMPLOYEE_T}
+            <div class="modal fade" id="modal_importEmployeeOrTraining" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h5 class="modal-title margin-lr-auto">Import pracovníka/vzdělávání</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form class="needs-validation" novalidate
+                                  action="{\Classes\StaticFunctions::getCurrentURL()}/employeeTraining/import"
+                                  method="post" enctype="multipart/form-data">
+                                <div class="clearfix"><br></div>
+                                <div class="form-group custom-file">
+                                    <input type="file" class="custom-file-input" name="import[]" id="n_import" accept=".xlsx,.xls,.csv" required/>
+                                    <label for="n_import" class="custom-file-label" data-browse="Vybrat soubor">Soubor</label>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <div class="clearfix"><br></div>
+                                <div class="form-group">
+                                    <label for="m_type">Typ</label>
+                                    <select id="m_type" name="type" required  data-placeholder="Vyberte typ" >
+                                        <option></option>
+                                        {foreach Classes\Super\Importer::TYPES as $key => $type}
+                                            <option value="{$key}">
+                                                {$type}
+                                            </option>
+                                        {/foreach}
+                                    </select>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-success" type="submit">
+                                    Přidat
+                                </button>
+                            </form>
+
+                            <script>
+                                $(function()
+                                {
+                                    $('#m_type').select2({
+                                        theme: 'bootstrap4',
+                                        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+                                        placeholder: $(this).data('placeholder'),
+                                        closeOnSelect: !$(this).attr('multiple'),
+                                        dropdownParent: $('#modal_importEmployeeOrTraining')
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modal_addCompleted" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h5 class="modal-title margin-lr-auto">Přidat zaměstnanci splněné školení</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form class="needs-validation" novalidate
+                                  action="{\Classes\StaticFunctions::getCurrentURL()}/employeeTraining/connectEEA"
+                                  method="post" enctype="multipart/form-data">
+                                <div class="form-row">
+                                    <input type="hidden" name="{\Classes\Completed\Manager::EMPLOYEE}" id="m_{\Classes\Completed\Manager::EMPLOYEE}">
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\Completed\Manager::FROM}">Od</label>
+                                        <input type="datetime-local" class="form-control" id="m_{\Classes\Completed\Manager::FROM}" name="{\Classes\Completed\Manager::FROM}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\Completed\Manager::TO}">Do</label>
+                                        <input type="datetime-local" class="form-control" id="m_{\Classes\Completed\Manager::TO}" name="{\Classes\Completed\Manager::TO}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\Completed\Manager::EDU}">Certifikát</label>
+                                        <select id="m_{\Classes\Completed\Manager::EDU}" name="{\Classes\Completed\Manager::EDU}" required  data-placeholder="Vyberte certifikát" >
+                                            <option></option>
+                                            {foreach $eduActivities as $data}
+                                                {var \Classes\EduActivity\EduActivity $eduActivity = $data}
+                                                <option value="{$eduActivity->getId()}">
+                                                    {$eduActivity->getName()}
+                                                </option>
+                                            {/foreach}
+                                        </select>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group custom-file">
+                                    <input type="file" class="custom-file-input" name="{\Classes\Completed\Manager::CERTIFICATE}[]" id="n_{\Classes\Completed\Manager::CERTIFICATE}" accept="image/*"/>
+                                    <label for="n_{\Classes\Completed\Manager::CERTIFICATE}" class="custom-file-label" data-browse="Vybrat soubor">Obrázek certifikátu</label>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <div class="clearfix"><br></div>
+                                <div class="form-group custom-file">
+                                    <input type="file" class="custom-file-input" name="{\Classes\Completed\Manager::CONTRACT}[]" id="n_{\Classes\Completed\Manager::CONTRACT}" accept=".pdf"/>
+                                    <label for="n_{\Classes\Completed\Manager::CONTRACT}" class="custom-file-label" data-browse="Vybrat soubor">Smlouva se zaměstnavatelem</label>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <div class="clearfix"><br></div>
+                                <div class="form-group">
+                                    <label for="m_{\Classes\Completed\Manager::NOTE}">Poznámka</label>
+                                    <textarea class="form-control" id="m_{\Classes\Completed\Manager::NOTE}" name="{\Classes\Completed\Manager::NOTE}" rows="3"
+                                              required></textarea>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-success" type="submit">
+                                    Přidat
+                                </button>
+                            </form>
+
+                            <script>
+                                $(function()
+                                {
+                                    $('#m_{\Classes\Completed\Manager::EDU|noescape}').select2({
+                                        theme: 'bootstrap4',
+                                        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+                                        placeholder: $(this).data('placeholder'),
+                                        closeOnSelect: !$(this).attr('multiple'),
+                                        dropdownParent: $('#modal_addCompleted')
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modal_employeeDetail" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h5 class="modal-title margin-lr-auto">Dokončená školení</h5>
+                        </div>
+                        <div class="modal-body" id="completed-employee-detail">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {case \Classes\DefaultClass::MODAL_LEADER}
+            <div class="modal fade" id="modal_addEmployee" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h5 class="modal-title margin-lr-auto">Přidání pracovníka</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form class="needs-validation" novalidate
+                                  action="{\Classes\StaticFunctions::getCurrentURL()}/employeeTraining/employeeAdd"
+                                  method="post">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="m_{\Classes\Employee\Manager::FIRSTNAME}">Jméno</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\Employee\Manager::FIRSTNAME}" name="{\Classes\Employee\Manager::FIRSTNAME}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="m_{\Classes\Employee\Manager::LASTNAME}">Přijení</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\Employee\Manager::LASTNAME}" name="{\Classes\Employee\Manager::LASTNAME}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\Employee\Manager::PERSONAL_NUMBER}">STAG ID</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\Employee\Manager::PERSONAL_NUMBER}" name="{\Classes\Employee\Manager::PERSONAL_NUMBER}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\Employee\Manager::TITLES}">Tituly</label>
+                                        <input type="text" class="form-control" id="m_{\Classes\Employee\Manager::TITLES}" name="{\Classes\Employee\Manager::TITLES}" required>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="m_{\Classes\Employee\Manager::WORK}">Pracoviště</label>
+                                        <select id="m_{\Classes\Employee\Manager::WORK}" name="{\Classes\Employee\Manager::WORK}" required  data-placeholder="Vyberte pracoviště" >
+                                            <option></option>
+                                            {foreach $workPlaces as $workData}
+                                                {var \Classes\WorkPlace\WorkPlace $workPlace = $workData}
+                                                <option n:attr="value: $workPlace->getId()">{$workPlace->getName()}</option>
+                                            {/foreach}
+                                        </select>
+                                        <div class="valid-feedback">
+                                            Vše vypadá v pořádku
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Něco je špatně. Prosím vyplňte pole správně
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="m_{\Classes\Employee\Manager::DES}">Popis</label>
+                                    <textarea class="form-control" id="m_{\Classes\Employee\Manager::DES}" name="{\Classes\Employee\Manager::DES}" rows="3"></textarea>
+                                    <div class="valid-feedback">
+                                        Vše vypadá v pořádku
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Něco je špatně. Prosím vyplňte pole správně
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-success" type="submit">
+                                    Přidat
+                                </button>
+                            </form>
+
+                            <script>
+                                $(function()
+                                {
+                                    $('#m_{\Classes\Employee\Manager::WORK|noescape}').select2({
+                                        theme: 'bootstrap4',
+                                        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+                                        placeholder: $(this).data('placeholder'),
+                                        closeOnSelect: !$(this).attr('multiple'),
+                                        dropdownParent: $('#modal_addEmployee')
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    {/switch}
+
+    <script>
+        $('.custom-file-input').on('change', function()
+            {
+                let name = $(this)[0].files[0].name;
+                $(this).next('.custom-file-label').html(name);
+            }
+        );
+    </script>
+{/ifset}

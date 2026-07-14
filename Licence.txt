@@ -1,0 +1,54 @@
+WOS Widget / Q-Quartile Finder
+License Terms
+
+Copyright (c) 2026 Nuimi and repository contributors.
+All rights reserved.
+
+1. Nature of the license
+
+This project is provided as proprietary software. Unless stated otherwise in a separate written agreement, obtaining the source code, binary files, or related documentation does not grant any right to publicly distribute, sell, sublicense, or publish the project.
+
+2. Permitted use
+
+The authorized owner of the project and persons explicitly authorized by that owner may use the software for:
+
+- internal operation
+- development, servicing, and maintenance
+- local testing
+- deployment within approved infrastructure
+
+3. Restrictions
+
+Without prior written consent from the copyright holder, it is not permitted to:
+
+- provide the source code or packages to third parties
+- sell, rent, or sublicense the project further
+- publish modified or unmodified copies in public repositories
+- remove or alter copyright and license notices
+
+4. Modifications and derivative works
+
+Modifications of the source code are permitted only for the internal needs of the project owner or persons demonstrably authorized to do so. All such modified works remain subject to this proprietary regime unless a written agreement states otherwise.
+
+5. Third-party libraries and assets
+
+This project may contain third-party libraries, fonts, images, or other components. Those parts remain licensed under their original licenses, and this license does not apply to them where their own license terms do not allow it.
+
+For orientation, check in particular:
+
+- `composer.json`
+- `package.json`
+- license files supplied inside `vendor/`
+- assets and fonts in the `www/` directory
+
+6. Disclaimer of warranty
+
+The software is provided "as is", without any express or implied warranty, including warranties of merchantability, fitness for a particular purpose, or non-infringement.
+
+7. Limitation of liability
+
+Neither the author nor the contributors shall be liable for any direct, indirect, consequential, special, or incidental damages arising from the use of, or inability to use, this software, even if advised of the possibility of such damages.
+
+8. License changes
+
+The copyright holder reserves the right to replace or supplement this license text at any time for future versions of the project.

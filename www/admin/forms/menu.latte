@@ -1,0 +1,15 @@
+{varType int $activeMenu}
+
+<div class="sidebar-menu-inner">
+    <ul class="nav nav-pills nav-stacked custom-nav">
+        <li n:class="$activeMenu == Classes\DefaultClass::MENU_ADMIN ? 'active'">
+            <a href="{\Classes\StaticFunctions::getCurrentURL()}/admin/">
+                <i class="fa fa-home"></i> <span>Domů</span>
+            </a>
+        </li>
+    </ul>
+    <a class="toggle-btn">
+        <i class="fa fa-angle-double-left menu-collapsed__left"><span>Skrýt menu</span></i>
+        <i class="fa fa-angle-double-right menu-collapsed__right"></i>
+    </a>
+</div>

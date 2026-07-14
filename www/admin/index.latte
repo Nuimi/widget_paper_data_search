@@ -1,0 +1,218 @@
+{varType array $settings}
+
+{extends @layout.latte}
+
+{block body}
+    <div class="main-content ">
+        <div class="container-fluid content-top-gap">
+
+            <section class="template-cards">
+                <div class="card card_border height100">
+                    <div class="cards__heading">
+                        <h3>Administrace - <span>Home</span></h3>
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="row">
+
+                            <div class="col-lg-12 chart-grid">
+                                <div class="text-center">
+                                    <h1>Vítejte v nastavení informací pro Q-Finder</h1>
+
+                                    <blockquote class="blockquote text-center">
+                                        <p class="mb-0">Zde si lze nastavit informace které chcete vidět</p>
+                                        <footer class="blockquote-footer">
+                                            <cite title="Source Title">Správce</cite>
+                                        </footer>
+                                    </blockquote>
+
+                                    <div class="clearfix"><br/></div>
+
+                                    <div class="col-md-6">
+                                        {var $settings = $settings ?? []}
+                                        {var $jif = isset($settings[\Classes\Settings\Manager::JIF]) && is_array($settings[\Classes\Settings\Manager::JIF]) ? $settings[\Classes\Settings\Manager::JIF] : []}
+                                        {var $ainf = isset($settings[\Classes\Settings\Manager::AINF]) && is_array($settings[\Classes\Settings\Manager::AINF]) ? $settings[\Classes\Settings\Manager::AINF] : []}
+                                        {var $impact = isset($settings[\Classes\Settings\Manager::IMPACT]) && is_array($settings[\Classes\Settings\Manager::IMPACT]) ? $settings[\Classes\Settings\Manager::IMPACT] : []}
+                                        {var $influence = isset($settings[\Classes\Settings\Manager::INFLUENCE]) && is_array($settings[\Classes\Settings\Manager::INFLUENCE]) ? $settings[\Classes\Settings\Manager::INFLUENCE] : []}
+                                        {var $sourceMetrics = isset($settings[\Classes\Settings\Manager::SOURCE]) && is_array($settings[\Classes\Settings\Manager::SOURCE]) ? $settings[\Classes\Settings\Manager::SOURCE] : []}
+                                        <form class="text-left" method="post" action="{\Classes\StaticFunctions::getCurrentURL()}/admin/saveSettings">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input" id="{\Classes\Settings\Manager::JIF}" name="{\Classes\Settings\Manager::JIF}"
+                                                       data-toggle="collapse" data-target="#jif-info" aria-expanded="true" aria-controls="jif-info"
+                                                       n:attr="checked => isset($settings[\Classes\Settings\Manager::JIF]) ? true : false">
+                                                <label class="custom-control-label" for="{\Classes\Settings\Manager::JIF}">JIF</label>
+                                            </div>
+                                            <div n:class="collapse, isset($settings[\Classes\Settings\Manager::JIF]) ? show" id="jif-info">
+                                                <div class="card card-body ">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="jifC" name="jif[jifC]"
+                                                               n:attr="checked => isset($jif['jifC']) ? true : false">
+                                                        <label class="custom-control-label" for="jifC">Category</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="jifE" name="jif[jifE]"
+                                                               n:attr="checked => isset($jif['jifE']) ? true : false">
+                                                        <label class="custom-control-label" for="jifE">Edition</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="jifQ" name="jif[jifQ]"
+                                                               n:attr="checked => isset($jif['jifQ']) ? true : false">
+                                                        <label class="custom-control-label" for="jifQ">Quartile</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="jifR" name="jif[jifR]"
+                                                               n:attr="checked => isset($jif['jifR']) ? true : false">
+                                                        <label class="custom-control-label" for="jifR">Rank</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input" id="{\Classes\Settings\Manager::IMPACT}" name="{\Classes\Settings\Manager::IMPACT}"
+                                                       data-toggle="collapse" data-target="#impact-info" aria-expanded="false" aria-controls="impact-info"
+                                                       n:attr="checked => isset($settings[\Classes\Settings\Manager::IMPACT]) ? true : false">
+                                                <label class="custom-control-label" for="{\Classes\Settings\Manager::IMPACT}">Impact Metrics</label>
+                                            </div>
+                                            <div n:class="collapse, isset($settings[\Classes\Settings\Manager::IMPACT]) ? show" id="impact-info">
+                                                <div class="card card-body ">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="impactJif" name="impactMetrics[jif]"
+                                                               n:attr="checked => isset($impact['jif']) ? true : false">
+                                                        <label class="custom-control-label" for="impactJif">JIF</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="impactJif5Years" name="impactMetrics[jif5Years]"
+                                                               n:attr="checked => isset($impact['jif5Years']) ? true : false">
+                                                        <label class="custom-control-label" for="impactJif5Years">JIF 5 Years</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="impactJifWithoutSelfCitations" name="impactMetrics[jifWithoutSelfCitations]"
+                                                               n:attr="checked => isset($impact['jifWithoutSelfCitations']) ? true : false">
+                                                        <label class="custom-control-label" for="impactJifWithoutSelfCitations">JIF Without Self Citations</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="impactJci" name="impactMetrics[jci]"
+                                                               n:attr="checked => isset($impact['jci']) ? true : false">
+                                                        <label class="custom-control-label" for="impactJci">JCI</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="impactImmediacyIndex" name="impactMetrics[immediacyIndex]"
+                                                               n:attr="checked => isset($impact['immediacyIndex']) ? true : false">
+                                                        <label class="custom-control-label" for="impactImmediacyIndex">Immediacy Index</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="impactTotalCites" name="impactMetrics[totalCites]"
+                                                               n:attr="checked => isset($impact['totalCites']) ? true : false">
+                                                        <label class="custom-control-label" for="impactTotalCites">Total Cites</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input" id="{\Classes\Settings\Manager::AINF}" name="{\Classes\Settings\Manager::AINF}"
+                                                       data-toggle="collapse" data-target="#ainf-info" aria-expanded="false" aria-controls="ainf-info"
+                                                       n:attr="checked => isset($settings[\Classes\Settings\Manager::AINF]) ? true : false">
+                                                <label class="custom-control-label" for="{\Classes\Settings\Manager::AINF}">Article Influence</label>
+                                            </div>
+                                            <div n:class="collapse, isset($settings[\Classes\Settings\Manager::AINF]) ? show" id="ainf-info">
+                                                <div class="card card-body ">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="ainfC" name="ainf[ainfC]"
+                                                               n:attr="checked => isset($ainf['ainfC']) || isset($ainf['ainC']) ? true : false">
+                                                        <label class="custom-control-label" for="ainfC">Category</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="ainfE" name="ainf[ainfE]"
+                                                               n:attr="checked => isset($ainf['ainfE']) || isset($ainf['ainE']) ? true : false">
+                                                        <label class="custom-control-label" for="ainfE">Edition</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="ainQ" name="ainf[ainQ]"
+                                                               n:attr="checked => isset($ainf['ainQ']) ? true : false">
+                                                        <label class="custom-control-label" for="ainQ">Quartile</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="ainR" name="ainf[ainR]"
+                                                               n:attr="checked => isset($ainf['ainR']) ? true : false">
+                                                        <label class="custom-control-label" for="ainR">Rank</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input" id="{\Classes\Settings\Manager::INFLUENCE}" name="{\Classes\Settings\Manager::INFLUENCE}"
+                                                       data-toggle="collapse" data-target="#influence-info" aria-expanded="false" aria-controls="influence-info"
+                                                       n:attr="checked => isset($settings[\Classes\Settings\Manager::INFLUENCE]) ? true : false">
+                                                <label class="custom-control-label" for="{\Classes\Settings\Manager::INFLUENCE}">Influence Metrics</label>
+                                            </div>
+                                            <div n:class="collapse, isset($settings[\Classes\Settings\Manager::INFLUENCE]) ? show" id="influence-info">
+                                                <div class="card card-body ">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="influenceArticleInfluence" name="influenceMetrics[articleInfluence]"
+                                                               n:attr="checked => isset($influence['articleInfluence']) ? true : false">
+                                                        <label class="custom-control-label" for="influenceArticleInfluence">Article Influence</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="influenceEigenFactorScore" name="influenceMetrics[eigenFactorScore]"
+                                                               n:attr="checked => isset($influence['eigenFactorScore']) ? true : false">
+                                                        <label class="custom-control-label" for="influenceEigenFactorScore">EigenFactor Score</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="influenceEigenFactorNormalized" name="influenceMetrics[eigenFactorNormalized]"
+                                                               n:attr="checked => isset($influence['eigenFactorNormalized']) ? true : false">
+                                                        <label class="custom-control-label" for="influenceEigenFactorNormalized">EigenFactor Normalized</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input" id="{\Classes\Settings\Manager::SOURCE}" name="{\Classes\Settings\Manager::SOURCE}"
+                                                       data-toggle="collapse" data-target="#source-info" aria-expanded="false" aria-controls="source-info"
+                                                       n:attr="checked => isset($settings[\Classes\Settings\Manager::SOURCE]) ? true : false">
+                                                <label class="custom-control-label" for="{\Classes\Settings\Manager::SOURCE}">Source Metrics</label>
+                                            </div>
+                                            <div n:class="collapse, isset($settings[\Classes\Settings\Manager::SOURCE]) ? show" id="source-info">
+                                                <div class="card card-body ">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="sourceJifPercentile" name="sourceMetrics[jifPercentile]"
+                                                               n:attr="checked => isset($sourceMetrics['jifPercentile']) || isset($settings[\Classes\Settings\Manager::JIFP]) ? true : false">
+                                                        <label class="custom-control-label" for="sourceJifPercentile">JIF Percentile</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="sourceCitableItemsTotal" name="sourceMetrics[citableItemsTotal]"
+                                                               n:attr="checked => isset($sourceMetrics['citableItemsTotal']) ? true : false">
+                                                        <label class="custom-control-label" for="sourceCitableItemsTotal">Citable Items Total</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="sourceArticlesPercentage" name="sourceMetrics[citableItemsArticlesPercentage]"
+                                                               n:attr="checked => isset($sourceMetrics['citableItemsArticlesPercentage']) ? true : false">
+                                                        <label class="custom-control-label" for="sourceArticlesPercentage">Articles Percentage</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="sourceHalfLifeCited" name="sourceMetrics[halfLifeCited]"
+                                                               n:attr="checked => isset($sourceMetrics['halfLifeCited']) ? true : false">
+                                                        <label class="custom-control-label" for="sourceHalfLifeCited">Half Life Cited</label>
+                                                    </div>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="sourceHalfLifeCiting" name="sourceMetrics[halfLifeCiting]"
+                                                               n:attr="checked => isset($sourceMetrics['halfLifeCiting']) ? true : false">
+                                                        <label class="custom-control-label" for="sourceHalfLifeCiting">Half Life Citing</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <button type="submit" class="btn btn-primary">
+                                                Uložit
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{/block}

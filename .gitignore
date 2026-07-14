@@ -1,0 +1,9 @@
+# file: ~/.gitignore_global
+#git rm --cached .idea -r
+.idea
+cache
+/cache
+/vendor/
+/config/config.php
+/node_modules/
+/tmp

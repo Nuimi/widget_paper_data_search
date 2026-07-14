@@ -1,0 +1,196 @@
+@green : #4CAF50;
+@red : #f44336;
+@blue : #12bbd4;
+@black : #000;
+
+.height100{
+  min-height: 100vh !important;
+}
+
+.alert-my {
+  padding: 20px;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.6s;
+  margin-bottom: 15px;
+  z-index: 10;
+  width: 80% !important;
+  position: fixed;
+  top: 10%;
+}
+
+.alert-my.success {
+  background-color: @green;
+}
+
+.alert-my.warning {
+  background-color: @red;
+}
+
+.a-sub{
+  color: @blue !important;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.margin-left-little{
+  margin-left: 10px;
+}
+
+.margin-right-little{
+  margin-right: 10px;
+}
+
+.login{
+  background: url("/www/admin/assets/images/my/wallpaper_1.jpg") no-repeat fixed center;
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  color: white !important;
+
+  .login-body{
+    background-color: rgba(0,0,0,0.5);
+    height: 100vh;
+    width: 100vw;
+  }
+  p{
+    color: white !important;
+  }
+}
+
+.form-between-space {
+  text-align: center;
+  margin-top: 2.5%;
+  margin-bottom: 2.5%;
+  h2, h1 {
+    width: 100%;
+    border-bottom: 1px solid #000;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+  }
+
+  h2 span, h1 span {
+    background:#fff;
+    padding:0 10px;
+  }
+}
+
+ul.ks-cboxtags {
+  list-style: none;
+  padding: 20px;
+}
+ul.ks-cboxtags li{
+  display: inline;
+}
+ul.ks-cboxtags li label{
+  display: inline-block;
+  background-color: rgba(255, 255, 255, .9);
+  border: 2px solid rgba(139, 139, 139, .3);
+  color: #adadad;
+  border-radius: 25px;
+  white-space: nowrap;
+  margin: 3px 0px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .2s;
+}
+
+ul.ks-cboxtags li label {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+ul.ks-cboxtags li label::before {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 12px;
+  padding: 2px 6px 2px 2px;
+  content: "\f067";
+  transition: transform .3s ease-in-out;
+}
+
+ul.ks-cboxtags li input[type="checkbox"]:checked + label::before {
+  content: "\f00c";
+  transform: rotate(-360deg);
+  transition: transform .3s ease-in-out;
+}
+
+ul.ks-cboxtags li input[type="checkbox"]:checked + label {
+  border: 2px solid #1bdbf8;
+  background-color: #12bbd4;
+  color: #fff;
+  transition: all .2s;
+}
+
+ul.ks-cboxtags li input[type="checkbox"] {
+  display: absolute;
+}
+ul.ks-cboxtags li input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+}
+ul.ks-cboxtags li input[type="checkbox"]:focus + label {
+  border: 2px solid #e9a1ff;
+}
+
+.helper-middle{
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.imageEdit {
+  width: 25%;
+  height: 25%;
+}
+
+.profile-img-layout-admin {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50em;
+}
+
+.loader{
+  background-color: white;
+  z-index: 10000;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  img{
+    position: relative;
+    top: 40vh;
+    left: 45vw;
+  }
+}
+
+.hidden{
+  display: none !important;
+}
+
+.noHover{
+   pointer-events: none;
+}
+
+.text-bold{
+  font-weight: bold;
+}
+
+.order-tr{
+  cursor: pointer;
+}
+.order-tr:hover{
+  font-weight: bolder;
+  font-size: 1.05em;
+}

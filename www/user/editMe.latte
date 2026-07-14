@@ -1,0 +1,85 @@
+{varType array $users}
+
+{extends ../admin/@layout.latte}
+
+{block body}
+    <div class="main-content ">
+        <div class="container-fluid content-top-gap">
+
+            <section class="template-cards">
+                <div class="card card_border height100">
+                    <div class="cards__heading">
+                        <h3>Administrace - <span>Uživatel</span></h3>
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="row">
+
+                            <div class="col-lg-12 chart-grid">
+                                <div class="text-center">
+                                    <h1>Uživatelský prostor</h1>
+
+                                    <div>
+                                        <h3 class="level-2 separator">Změna hesla</h3>
+                                        <div class="offset-2">
+                                            <form class="needs-validation  col-md-10" novalidate
+                                                  action="{\Classes\StaticFunctions::getCurrentURL()}/user/renewPassword/"
+                                                  method="post"
+                                                  oninput='password2.setCustomValidity((password2.value !== "" && password2.value !== password.value) ? "Hesla se neshodují" : "")'>
+                                                <div class="form-row text-left">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="password">Heslo</label>
+                                                        <input type="password" class="form-control" id="password" name="password" required>
+                                                        <div class="valid-feedback">
+                                                            Vše vypadá v pořádku
+                                                        </div>
+                                                        <div class="invalid-feedback">
+                                                            Něco je špatně. Prosím vyplňte pole správně
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="password2">Heslo znovu</label>
+                                                        <input type="password" class="form-control" id="password2" name="password2" required>
+                                                        <div class="valid-feedback">
+                                                            Vše vypadá v pořádku
+                                                        </div>
+                                                        <div class="invalid-feedback">
+                                                            Něco je špatně. Vypadá to že se hesla neshodují
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-outline-success" type="submit">
+                                                    Nastav
+                                                </button>
+                                            </form>
+
+                                            <script>
+                                                (function() {
+                                                    'use strict';
+                                                    window.addEventListener('load', function() {
+                                                        var forms = document.getElementsByClassName('needs-validation');
+                                                        Array.prototype.filter.call(forms, function(form) {
+                                                            form.addEventListener('submit', function(event) {
+                                                                if (form.checkValidity() === false) {
+                                                                    event.preventDefault();
+                                                                    event.stopPropagation();
+                                                                }
+                                                                form.classList.add('was-validated');
+                                                            }, false);
+                                                        });
+                                                    }, false);
+                                                })();
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{/block}
+  

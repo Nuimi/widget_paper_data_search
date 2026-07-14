@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="cs">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Q-Quartile</title>
+        <link rel="stylesheet" href="assets/css/popup.css" />
+    </head>
+
+    <body>
+        <div class="app">
+
+            <div id="loginView" style="display:none;">
+                <header class="topbar">
+                    <div class="brand">
+                        <div class="logo">Q</div>
+                        <div class="brandText">
+                            <div class="brandName">Q-Quartile</div>
+                            <div class="brandSub">Přihlášení</div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="content">
+                    <section class="card">
+                        <div class="titleRow">
+                            <h1 class="title">Přihlášení</h1>
+                        </div>
+
+                        <div class="grid" style="gap: 10px;">
+                            <div class="row" style="display:block;">
+                                <label for="login">Login</label><br>
+                                <input id="login" type="text" style="width:100%;" />
+                            </div>
+
+                            <div class="row" style="display:block; margin-top:10px;">
+                                <label for="password">Heslo</label><br>
+                                <input id="password" type="password" style="width:100%;" />
+                            </div>
+                        </div>
+
+                        <div id="loginError" class="hint" style="display:none; color:red; margin-top:10px;"></div>
+
+                        <div style="margin-top:15px;">
+                            <button id="loginBtn" class="btn">Přihlásit se</button>
+                        </div>
+                    </section>
+                </main>
+            </div>
+
+            <div id="resultView" style="display:none;">
+                <header class="topbar">
+                    <div class="brand">
+                        <div class="logo">Q</div>
+                        <div class="brandText">
+                            <div class="brandName">Q-Quartile</div>
+                            <div class="brandSub">Journal check</div>
+                        </div>
+                    </div>
+
+                    <div class="pill" id="pillQuartile" data-tone="neutral">–</div>
+                </header>
+
+                <main class="content">
+                    <section class="card">
+                        <div class="titleRow">
+                            <div>
+                                <h1 class="title" id="articleTitle">Zatím žádný výsledek</h1>
+                                <div class="muted" id="journalName"></div>
+                            </div>
+                            <span class="muted" id="year"></span>
+                        </div>
+
+                        <div class="grid">
+                            <div class="row">
+                                <span class="label">ISSN</span>
+                                <span class="value" id="issn">–</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Zdroj</span>
+                                <span class="value" id="source">–</span>
+                            </div>
+                        </div>
+
+                        <div class="hint" id="hint">
+                            Vyber text nebo DOI a použij kontextové menu.
+                        </div>
+                    </section>
+                    <div id="allMetrics"></div>
+                    <details class="details" id="metricsWrap">
+                        <summary>
+                            <span>Metrics</span>
+                            <span class="muted">JSON</span>
+                        </summary>
+                        <pre class="code" id="metrics">–</pre>
+                    </details>
+                </main>
+
+                <footer class="footer">
+                    <div class="footer_buttons">
+                        <a href="https://imitweby.uhk.cz/widget/admin" target="_blank" class="btn">Změna informací</a>
+                        <button id="logoutBtn" class="btn" type="button">Odhlásit se</button>
+                    </div>
+                    <span class="muted">Tip: Q badge se ukáže i na ikoně rozšíření.</span>
+                </footer>
+            </div>
+        </div>
+
+        <script src="popup.js"></script>
+    </body>
+</html>

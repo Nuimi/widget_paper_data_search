@@ -1,0 +1,87 @@
+{varType int $pages}
+{varType int $page}
+{varType string $ajax}
+{varType array $_SERVER}
+
+{if $pages > 1}
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" n:if="$page > 3">
+                <a class="page-link" data-set-page="1">
+                    <i class="fa fa-fast-backward"></i>
+                </a>
+            </li>
+            <li class="page-item" n:if="$page != 1">
+                <a class="page-link" data-set-page="{$page - 1}">
+                    <i class="fa fa-backward"></i>
+                </a>
+            </li>
+            {var $startI = ($page > 3)? $page - 2 : 1}
+            {var $endI = ($page > 3)? 4 + $startI : 5}
+            {if $endI > $pages}{var $endI = $pages}{/if}
+            {for $i = $startI ; $i <= $endI; $i++}
+                {if $pages > 5}
+                    {if $page > 3 && $i == $startI}
+                        <li class="page-item" >
+                            <a class="page-link">...</a>
+                        </li>
+                    {/if}
+
+                    <li class="page-item {if $i == $page}active{/if}" >
+                        <a class="page-link" data-set-page="{$i}">{$i}</a>
+                    </li>
+
+                    {if $i == $endI && $endI != $pages}
+                        <li class="page-item" >
+                            <a class="page-link">...</a>
+                        </li>
+                    {/if}
+                {else}
+                    <li class="page-item {if $i == $page}active{/if}" >
+                        <a class="page-link" data-set-page="{$i}">{$i}</a>
+                    </li>
+                {/if}
+            {/for}
+            <li class="page-item" n:if="$page != $pages">
+                <a class="page-link" data-set-page="{$page + 1}">
+                    <i class="fa fa-forward"></i>
+                </a>
+            </li>
+            <li class="page-item" n:if="$page < ($pages - 3)">
+                <a class="page-link" data-set-page="{$pages}">
+                    <i class="fa fa-fast-forward"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        $(document).on('click', '[data-set-page]', function()
+            {
+                $.get({\Classes\StaticFunctions::getCurrentURL()} + '/ajax/' + {$ajax} + '/',
+                    {
+                        page: $(this).data('set-page'),
+                        search: $('#searchString').val()
+                    },
+                    function (data)
+                    {
+                        $('#' + {$ajax}).html(data);
+                        $(document).scrollTop(250);
+                    }
+                );
+            }
+        );
+    </script>
+
+    <br>
+
+    {if !Classes\Filters::getShowAll()}
+        <a href="{$_SERVER['REQUEST_URI']}?showAll=true">
+            Zobrazit vše
+        </a>
+    {else}
+        <a href="{str_replace('?showAll=true', '', $_SERVER['REQUEST_URI'])}">
+            Standartní zobrazení
+        </a>
+    {/if}
+{/if}

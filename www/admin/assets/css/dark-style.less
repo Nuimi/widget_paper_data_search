@@ -1,0 +1,358 @@
+html[data-bs-theme="dark"]{
+    --nuimi-link: #a7b5ff;
+    --nuimi-link-hover: #c1ccff;
+    --nuimi-body-bg: #212529;
+    --nuimi-body-bg-darker: #1f1e1e;
+    --nuimi-body-color: #dee2e6;
+    --nuimi-surface: #2b3035;
+    --nuimi-surface-2: #343a40;
+    --nuimi-border: rgba(255,255,255,.15);
+    body {
+        background-color: var(--nuimi-body-bg) !important;
+        color: var(--nuimi-body-color) !important;
+    }
+
+    /*-----------CARDS--------------*/
+    .card,
+    .card-body,
+    .card-header,
+    .card-footer {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+    .card-title,
+    .card-text,
+    .card h1,
+    .card h2,
+    .card h3,
+    .card h4,
+    .card h5,
+    .card h6 {
+        color: var(--nuimi-body-color) !important;
+    }
+    .cards__heading,
+    .section-title,
+    .page-title {
+        color: var(--nuimi-body-color) !important;
+    }
+    .cards__heading h1,
+    .cards__heading h2,
+    .cards__heading h3,
+    .cards__heading h4,
+    .cards__heading h5,
+    .cards__heading h6,
+    .cards__heading .title {
+        color: var(--nuimi-body-color) !important;
+    }
+    .cards__heading .subtitle,
+    .cards__heading small,
+    .cards__heading .muted,
+    .cards__heading .text-muted,
+    .cards__heading p {
+        color: rgba(255,255,255,.6) !important;
+    }
+    .cards__heading i {
+        color: currentColor !important;
+    }
+    .cards__heading,
+    .header {
+        color: var(--nuimi-body-color) !important;
+        background: var(--nuimi-body-bg);
+    }
+
+    /*-----------TABLES--------------*/
+    .table {
+        color: var(--nuimi-body-color) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+    .table th,
+    .table td {
+        border-color: var(--nuimi-border) !important;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(255,255,255,.04) !important;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(255,255,255,.06) !important;
+        color: white !important;
+    }
+
+    /*-----------FORMS--------------*/
+    .form-control,
+    .custom-select,
+    .custom-file,
+    .custom-file-input,
+    .input-group-text,
+    .form-control-plaintext {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+    .form-control:focus,
+    .custom-select:focus {
+        box-shadow: none !important;
+        border-color: var(--nuimi-link) !important;
+    }
+    .custom-file-input {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border: 1px solid var(--nuimi-border) !important;
+        border-radius: .25rem;
+    }
+    .custom-file-label {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border: 1px solid var(--nuimi-border) !important;
+        border-radius: .25rem;
+        line-height: 1.5;
+    }
+    .custom-file-label::after {
+        background-color: var(--nuimi-surface-2) !important;
+        color: var(--nuimi-body-color) !important;
+        border-left: 1px solid var(--nuimi-border) !important;
+        content: attr(data-browse);
+    }
+    .custom-file-input:hover ~ .custom-file-label,
+    .custom-file-input:focus ~ .custom-file-label {
+        border-color: var(--nuimi-link) !important;
+        box-shadow: 0 0 0 .2rem rgba(167,181,255,.35) !important;
+    }
+    .custom-file-label.selected {
+        background-color: var(--nuimi-surface-2) !important;
+        color: var(--nuimi-body-color) !important;
+    }
+    .custom-file-input:disabled ~ .custom-file-label {
+        background-color: var(--nuimi-surface-2) !important;
+        color: rgba(255,255,255,.5) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+    .select2-container--bootstrap4 .select2-selection--single,
+    .select2-container--bootstrap4 .select2-selection--multiple {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border: 1px solid var(--nuimi-border) !important;
+        border-radius: .25rem;
+        min-height: calc(2.25rem + 2px);
+    }
+    .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered,
+    .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__rendered {
+        color: var(--nuimi-body-color) !important;
+        line-height: 2.25rem;
+        padding-left: .75rem;
+        padding-right: 2rem;
+    }
+    .select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder,
+    .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__placeholder {
+        color: rgba(255,255,255,.6) !important;
+    }
+    .select2-container--bootstrap4 .select2-selection__arrow b {
+        border-color: var(--nuimi-body-color) transparent transparent transparent !important;
+        opacity: .85;
+    }
+    .select2-container--bootstrap4.select2-container--focus .select2-selection,
+    .select2-container--bootstrap4 .select2-selection:focus {
+        outline: 0 !important;
+        border-color: var(--nuimi-link) !important;
+        box-shadow: 0 0 0 .2rem rgba(167,181,255,.35) !important;
+    }
+    .select2-container--bootstrap4.select2-container--disabled .select2-selection {
+        background-color: var(--nuimi-surface-2) !important;
+        color: rgba(255,255,255,.5) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+    .select2-container--bootstrap4 .select2-selection__clear {
+        color: rgba(255,255,255,.8) !important;
+    }
+    .select2-container--bootstrap4 .select2-selection__clear:hover {
+        color: #fff !important;
+    }
+    .select2-container--bootstrap4 .select2-dropdown {
+        background-color: var(--nuimi-surface) !important;
+        border: 1px solid var(--nuimi-border) !important;
+        color: var(--nuimi-body-color) !important;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.3);
+    }
+    .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field {
+        background-color: var(--nuimi-surface-2) !important;
+        border: 1px solid var(--nuimi-border) !important;
+        color: var(--nuimi-body-color) !important;
+    }
+    .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field::placeholder {
+        color: rgba(255,255,255,.6) !important;
+    }
+    .select2-container--bootstrap4 .select2-results__option {
+        color: var(--nuimi-body-color) !important;
+        background-color: transparent !important;
+    }
+    .select2-container--bootstrap4 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(255,255,255,.06) !important;
+    }
+    .select2-container--bootstrap4 .select2-results__option--highlighted[aria-selected] {
+        background-color: #4755AB !important;
+        color: #fff !important;
+    }
+    .select2-container--bootstrap4 .select2-results__message {
+        color: rgba(255,255,255,.6) !important;
+    }
+    .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
+        background-color: var(--nuimi-body-bg-darker) !important;
+        border: 1px solid var(--nuimi-border) !important;
+        color: var(--nuimi-body-color) !important;
+    }
+    .dropdown-menu,
+    .modal-content,
+    .list-group-item {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+
+    /*-----------MENU--------------*/
+    .sidebar-menu,
+    .content-wrapper,
+    .navbar,
+    .footer,
+    .jumbotron,
+    .panel {
+        background-color: var(--nuimi-body-bg) !important;
+        color: var(--nuimi-body-color) !important;
+    }
+
+    .custom-nav  a {
+        color: var(--nuimi-body-color) !important;
+        background: transparent !important;
+    }
+    .custom-nav > li > a:hover,
+    .custom-nav > li.nav-active > a{
+        background-color: #4755AB !important;
+        color: #fff !important;
+    }
+
+    .custom-nav > li.active > a i{
+        color: #4755AB !important;
+    }
+    .custom-nav > li > ul {
+        background: var(--nuimi-surface-2) !important;
+    }
+    .custom-nav > li > ul > li > a:hover {
+        background-color: rgba(255,255,255,.06) !important;
+    }
+
+    /*-----------BUTTONS--------------*/
+    .button-color-blue:hover,
+    .button-color-green:hover,
+    .button-color-red:hover {
+        color: #fff !important;
+    }
+    .toggle-btn,
+    .btn-toggle,
+    .switch {
+        background-color: var(--nuimi-surface) !important;
+        color: var(--nuimi-body-color) !important;
+        border-color: var(--nuimi-border) !important;
+    }
+    .toggle-btn span{
+        color: var(--nuimi-body-color) !important;
+    }
+    .btn i,
+    a i {
+        color: currentColor !important;
+    }
+
+    /*-----------PAGINATION--------------*/
+    .pagination {
+        --pg-bg:        var(--nuimi-surface, #2b3035);
+        --pg-fg:        var(--nuimi-body-color, #dee2e6);
+        --pg-border:    var(--nuimi-border, rgba(255,255,255,.15));
+        --pg-hover-bg:  rgba(255,255,255,.06);
+        --pg-disabled:  rgba(255,255,255,.35);
+        --pg-active-bg: #4755AB;
+        --pg-active-fg: #fff;
+        --pg-focus:     rgba(167,181,255,.35);
+    }
+
+    .pagination .page-link {
+        background-color: var(--pg-bg) !important;
+        color: var(--pg-fg) !important;
+        border-color: var(--pg-border) !important;
+    }
+    .pagination .page-link:hover {
+        background-color: var(--pg-hover-bg) !important;
+        color: var(--pg-fg) !important;
+        border-color: var(--pg-border) !important;
+        text-decoration: none !important;
+    }
+
+    .pagination .page-item.active .page-link,
+    .pagination .active .page-link {
+        background-color: var(--pg-active-bg) !important;
+        border-color: var(--pg-active-bg) !important;
+        color: var(--pg-active-fg) !important;
+    }
+
+    .pagination .page-item.disabled .page-link,
+    .pagination .disabled .page-link {
+        background-color: var(--pg-bg) !important;
+        color: var(--pg-disabled) !important;
+        border-color: var(--pg-border) !important;
+        pointer-events: none;
+    }
+
+    .pagination .page-link:focus {
+        outline: 0;
+        box-shadow: 0 0 0 .2rem var(--pg-focus) !important;
+    }
+
+    .pagination.pagination-sm .page-link,
+    .pagination.pagination-lg .page-link {
+        background-color: var(--pg-bg) !important;
+        color: var(--pg-fg) !important;
+        border-color: var(--pg-border) !important;
+    }
+
+    .pagination .page-link i,
+    .pagination .page-link svg {
+        color: currentColor !important;
+        fill: currentColor !important;
+    }
+    .pagination .page-link span[aria-hidden="true"],
+    .pagination .page-link .page-ellipsis {
+        color: var(--pg-fg) !important;
+        opacity: .8;
+    }
+
+    /*-----------OTHERS--------------*/
+    .container-fluid.content-top-gap,
+    .content-top-gap {
+        background: var(--nuimi-body-bg-darker) !important;
+        color: var(--nuimi-body-color) !important;
+        box-shadow: none !important;
+        border-color: var(--nuimi-border) !important;
+    }
+
+    .content-top-gap .breadcrumb,
+    .content-top-gap .breadcrumb .breadcrumb-item,
+    .content-top-gap .breadcrumb a {
+        color: var(--nuimi-body-color) !important;
+    }
+    .content-top-gap .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        color: var(--nuimi-body-color) !important;
+        opacity: .5;
+    }
+    .loader{
+        background: var(--nuimi-body-bg);
+    }
+    .se-pre-con {
+         background: url(../images/Preloader_2.gif) center no-repeat var(--nuimi-body-bg);
+     }
+    .alert {
+        border-color: var(--nuimi-border) !important;
+    }
+
+    hr,
+    .border {
+        border-color: var(--nuimi-border) !important;
+    }
+}
+

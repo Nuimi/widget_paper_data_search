@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="cz">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Přihlášení</title>
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/css/style-starter.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/css/style.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/css/animate.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/css/my.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/fonts/font-awesome-6/css/all.min.css">
+
+        <link href="//fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900&display=swap" rel="stylesheet">
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/jquery-3.3.1.min.js"></script>
+        <style>
+            .gradient-custom {
+                /* fallback for old browsers */
+                background: #6a11cb;
+
+                /* Chrome 10-25, Safari 5.1-6 */
+                background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+                /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+                background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+            }
+
+            .myForm INPUT:-webkit-autofill,
+            .myForm SELECT:-webkit-autofill,
+            .myForm TEXTAREA:-webkit-autofill {
+                animation-name: onautofillstart;
+            }
+            .myForm INPUT:not(:-webkit-autofill),
+            .myForm SELECT:not(:-webkit-autofill),
+            .myForm TEXTAREA:not(:-webkit-autofill) {
+                animation-name: onautofillcancel;
+            }
+            .myForm .form-outline {
+                position: relative;
+                width: 100%;
+            }
+            .myForm .form-outline {
+                position: relative;
+                width: 100%;
+            }
+            .myForm .form-outline .form-helper {
+                width: 100%;
+                position: absolute;
+                font-size: 0.875em;
+                color: #757575;
+            }
+            .myForm .form-outline .form-helper .form-counter {
+                text-align: right;
+            }
+            .myForm .form-outline .trailing {
+                position: absolute;
+                right: 10px;
+                left: auto;
+                top: 50%;
+                transform: translateY(-50%);
+                pointer-events: none;
+            }
+            .myForm .form-outline .form-icon-trailing {
+                padding-right: 2rem !important;
+            }
+            .myForm .form-outline .form-control {
+                min-height: auto;
+                padding: 0.32rem 0.75rem;
+                border: 0;
+                background: transparent;
+                transition: all 0.2s linear;
+            }
+            .myForm .form-outline .form-control ~ .form-label {
+                position: absolute;
+                top: 0;
+                max-width: 90%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                left: 0.75rem;
+                padding-top: 0.37rem;
+                pointer-events: none;
+                transform-origin: 0 0;
+                transition: all 0.2s ease-out;
+                color: rgba(0, 0, 0, 0.6);
+                margin-bottom: 0;
+            }
+            .myForm .form-outline .form-control ~ .form-notch {
+                display: flex;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                text-align: left;
+                pointer-events: none;
+            }
+            .myForm .form-outline .form-control ~ .form-notch div {
+                pointer-events: none;
+                border: 1px solid #bdbdbd;
+                box-sizing: border-box;
+                background: transparent;
+                transition: all 0.2s linear;
+            }
+            .myForm .form-outline .form-control ~ .form-notch .form-notch-leading {
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 0.5rem;
+                border-right: none;
+                border-radius: 0.25rem 0 0 0.25rem;
+            }
+            .myForm .form-outline .form-control ~ .form-notch .form-notch-middle {
+                flex: 0 0 auto;
+                width: auto;
+                max-width: calc(100% - 1rem);
+                height: 100%;
+                border-right: none;
+                border-left: none;
+            }
+            .myForm .form-outline .form-control ~ .form-notch .form-notch-trailing {
+                flex-grow: 1;
+                height: 100%;
+                border-left: none;
+                border-radius: 0 0.25rem 0.25rem 0;
+            }
+            .myForm .form-outline .form-control:not(.placeholder-active)::-moz-placeholder {
+                opacity: 0;
+            }
+            .myForm .form-outline .form-control:not(.placeholder-active)::placeholder {
+                opacity: 0;
+            }
+            .myForm .form-outline .form-control.active::-moz-placeholder,
+            .myForm .form-outline .form-control:focus::-moz-placeholder {
+                opacity: 1;
+            }
+            .myForm .form-outline .form-control.active::placeholder,
+            .myForm .form-outline .form-control:focus::placeholder {
+                opacity: 1;
+            }
+            .myForm .form-outline .form-control:focus {
+                box-shadow: none !important;
+            }
+            .myForm .form-outline .form-control.active ~ .form-label,
+            .myForm .form-outline .form-control:focus ~ .form-label {
+                transform: translateY(-1rem) translateY(0.1rem) scale(0.8);
+            }
+            .myForm .form-outline .form-control:focus ~ .form-label {
+                color: #3b71ca;
+            }
+            .myForm .form-outline .form-control.active ~ .form-notch .form-notch-middle,
+            .myForm .form-outline .form-control:focus ~ .form-notch .form-notch-middle {
+                border-right: none;
+                border-left: none;
+                border-top: 1px solid transparent;
+            }
+            .myForm .form-outline .form-control:focus ~ .form-notch .form-notch-middle {
+                border-color: #3b71ca;
+                box-shadow: 0 1px 0 0 #3b71ca;
+                border-top: 1px solid transparent;
+            }
+            .myForm .form-outline .form-control.active ~ .form-notch .form-notch-leading,
+            .myForm .form-outline .form-control:focus ~ .form-notch .form-notch-leading {
+                border-right: none;
+            }
+            .myForm .form-outline .form-control:focus ~ .form-notch .form-notch-leading {
+                border-color: #3b71ca;
+                box-shadow: -1px 0 0 0 #3b71ca, 0 1px 0 0 #3b71ca, 0 -1px 0 0 #3b71ca;
+            }
+            .myForm .form-outline .form-control.active ~ .form-notch .form-notch-trailing,
+            .myForm .form-outline .form-control:focus ~ .form-notch .form-notch-trailing {
+                border-left: none;
+            }
+            .myForm .form-outline .form-control:focus ~ .form-notch .form-notch-trailing {
+                border-color: #3b71ca;
+                box-shadow: 1px 0 0 0 #3b71ca, 0 -1px 0 0 #3b71ca, 0 1px 0 0 #3b71ca;
+            }
+            .myForm .form-outline .form-control.disabled,
+            .myForm .form-outline .form-control:disabled,
+            .myForm .form-outline .form-control[readonly] {
+                background-color: #e9ecef;
+            }
+            .myForm .form-outline .form-control.form-control-lg {
+                font-size: 1rem;
+                line-height: 2.15;
+            }
+            .myForm .form-outline .form-control.form-control-lg ~ .form-label {
+                padding-top: 0.7rem;
+            }
+            .myForm .form-outline .form-control.form-control-lg.active ~ .form-label,
+            .myForm .form-outline .form-control.form-control-lg:focus ~ .form-label {
+                transform: translateY(-1.25rem) translateY(0.1rem) scale(0.8);
+            }
+            .myForm .form-outline .form-control.form-control-sm {
+                padding-top: 0.32rem;
+                padding-bottom: 0.32rem;
+                font-size: 0.775rem;
+                line-height: 1.5;
+            }
+            .myForm .form-outline .form-control.form-control-sm ~ .form-label {
+                padding-top: 0.33rem;
+                font-size: 0.775rem;
+            }
+            .myForm .form-outline .form-control.form-control-sm.active ~ .form-label,
+            .myForm .form-outline .form-control.form-control-sm:focus ~ .form-label {
+                transform: translateY(-0.85rem) translateY(0.1rem) scale(0.8);
+            }
+            .myForm .form-outline.form-white .form-control {
+                color: #fff;
+            }
+            .myForm .form-outline.form-white .form-control ~ .form-label {
+                color: #fbfbfb;
+            }
+            .myForm .form-outline.form-white .form-control ~ .form-notch div {
+                border-color: #fbfbfb;
+            }
+            .myForm .form-outline.form-white .form-control:focus ~ .form-label {
+                color: #fff;
+            }
+            .myForm .form-outline.form-white .form-control:focus ~ .form-notch .form-notch-middle {
+                border-color: #fff;
+                box-shadow: 0 1px 0 0 #fff;
+                border-top: 1px solid transparent;
+            }
+            .myForm .form-outline.form-white .form-control:focus ~ .form-notch .form-notch-leading {
+                border-color: #fff;
+                box-shadow: -1px 0 0 0 #fff, 0 1px 0 0 #fff, 0 -1px 0 0 #fff;
+            }
+            .myForm .form-outline.form-white .form-control:focus ~ .form-notch .form-notch-trailing {
+                border-color: #fff;
+                box-shadow: 1px 0 0 0 #fff, 0 -1px 0 0 #fff, 0 1px 0 0 #fff;
+            }
+            .myForm .form-outline.form-white .form-control::-moz-placeholder {
+                color: hsla(0, 0%, 100%, 0.7);
+            }
+            .myForm .form-outline.form-white .form-control::placeholder {
+                color: hsla(0, 0%, 100%, 0.7);
+            }
+            .myForm .form-outline.form-white .form-control.disabled,
+            .myForm .form-outline.form-white .form-control:disabled,
+            .myForm .form-outline.form-white .form-control[readonly] {
+                background-color: hsla(0, 0%, 100%, 0.45);
+            }
+        </style>
+    </head>
+    <body class="sidebar-menu-collapsed">
+        {include ../sharedAssets/latte/message.latte}
+        <div class="loader hidden" id="loader-page">
+            <img src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/images/Preloader_11.gif" alt="loading">
+        </div>
+        <section class="vh-100 gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                        <div class="my bg-dark text-white" style="border-radius: 1rem;">
+                            <div class="card-body p-5 text-center">
+
+                                <div class="mb-md-5 mt-md-4 pb-5">
+                                    <form class="myForm" method="post" action="{\Classes\StaticFunctions::getCurrentURL()}/user/login" autocomplete="off">
+                                        <h2 class="fw-bold mb-2 text-uppercase">Přihlášení</h2>
+                                        <p class="text-white-50 mb-5">Prosím vyplňte svoje údaje!</p>
+
+                                        <div class="form-outline form-white mb-4">
+                                            <input type="text" id="typeEmailX" class="form-control form-control-lg" name="userName" autocomplete="new-password" />
+                                            <label class="form-label" for="typeEmailX">Uživatelské jméno</label>
+                                            <div class="form-notch">
+                                                <div class="form-notch-leading" style="width: 9px;"></div>
+                                                <div class="form-notch-middle" style="width: 110px;"></div>
+                                                <div class="form-notch-trailing"></div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="form-outline form-white mb-4">
+                                            <input type="password" id="typePasswordX" class="form-control form-control-lg" name="password" autocomplete="new-password" />
+                                            <label class="form-label" for="typePasswordX">Heslo</label>
+                                            <div class="form-notch">
+                                                <div class="form-notch-leading" style="width: 9px;"></div>
+                                                <div class="form-notch-middle" style="width: 40px;"></div>
+                                                <div class="form-notch-trailing"></div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <button class="btn btn-outline-light btn-lg px-5" type="submit">Přihlásit</button>
+                                    </form>
+
+                                    <script>
+                                        $(document).on('keyup', '.form-control', function()
+                                            {
+                                                if ($(this).val() !== '')
+                                                {
+                                                    $(this).addClass('active')
+                                                } else {
+                                                    $(this).removeClass('active')
+                                                }
+                                            }
+                                        );
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="dashboard">
+            <p>&copy 2023 Login Page. All Rights Reserved | ReDesign by Nuimi</p>
+        </footer>
+        <button onclick="topFunction()" id="movetop" class="bg-primary" title="Go to top">
+            <span class="fa fa-angle-up"></span>
+        </button>
+        <script>
+            window.onscroll = function ()
+            {
+                scrollFunction()
+            };
+
+            function scrollFunction()
+            {
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20)
+                {
+                    document.getElementById("movetop").style.display = "block";
+                } else {
+                    document.getElementById("movetop").style.display = "none";
+                }
+            }
+
+            function topFunction()
+            {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/js/shared.js"></script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/jquery-1.10.2.min.js"></script>
+
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/jquery.nicescroll.js"></script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/scripts.js"></script>
+
+        <script>
+            var closebtns = document.getElementsByClassName("close-grid");
+            var i;
+
+            for (i = 0; i < closebtns.length; i++)
+            {
+                closebtns[i].addEventListener("click", function ()
+                    {
+                        this.parentElement.style.display = 'none';
+                    }
+                );
+            }
+            $(function ()
+                {
+                    $('.sidebar-menu-collapsed').click(function ()
+                        {
+                            $('body').toggleClass('noscroll');
+                        }
+                    )
+                }
+            );
+        </script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/modernizr.js"></script>
+        <script>
+            $(window).load(function ()
+                {
+                    $(".se-pre-con").fadeOut("slow");
+                }
+            );
+        </script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/bootstrap.min.js"></script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/default.js"></script>
+    </body>
+</html>

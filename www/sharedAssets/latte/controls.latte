@@ -1,0 +1,42 @@
+{varType int $controlMenu}
+
+{switch $controlMenu}
+    {case 1}
+        <a href="{\Classes\StaticFunctions::getCurrentURL()}/information/timeline" class="button-color-blue back">
+            <i class="fa-solid fa-calendar-days fa-3x"></i>
+        </a>
+        <a href="{\Classes\StaticFunctions::getCurrentURL()}/information/talk" class="button-color-blue speak">
+            <i class="fa-solid fa-comment fa-3x"></i>
+        </a>
+    {case 2}
+        <a href="{\Classes\StaticFunctions::getCurrentURL()}/" class="button-color-blue back">
+            <i class="fa fa-angles-left fa-3x"></i>
+        </a>
+        <a href="{\Classes\StaticFunctions::getCurrentURL()}/information/talk" class="button-color-blue speak">
+            <i class="fa-solid fa-comment fa-3x"></i>
+        </a>
+    {case 3}
+        <a href="{\Classes\StaticFunctions::getCurrentURL()}/" class="button-color-blue back">
+            <i class="fa fa-angles-left fa-3x"></i>
+        </a>
+        <a href="{\Classes\StaticFunctions::getCurrentURL()}/information/timeline" class="button-color-blue speak">
+            <i class="fa-solid fa-calendar-days fa-3x"></i>
+        </a>
+{/switch}
+
+
+{if Classes\StaticFunctions::getLanguage() == 'EN'}
+    <a class="btn button-color-blue control-language"
+       href="{\Classes\StaticFunctions::getCurrentURL()}/home/changeLanguage/?language=CZ">
+        CZ
+    </a>
+{else}
+    <a class="btn button-color-blue control-language"
+       href="{\Classes\StaticFunctions::getCurrentURL()}/home/changeLanguage/?language=EN">
+        EN
+    </a>
+{/if}
+
+<span class="button-color-blue control-info" data-bs-toggle="modal" data-bs-target="#modal-controlDescription">
+    <i class="fa fa-circle-info fa-3x"></i>
+</span>

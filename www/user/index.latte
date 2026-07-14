@@ -1,0 +1,117 @@
+{extends ../admin/@layout.latte}
+
+{block body}
+    <div class="main-content ">
+        <div class="container-fluid content-top-gap">
+
+            <section class="template-cards">
+                <div class="card card_border height100">
+                    <div class="cards__heading">
+                        <h3>Administrace - <span>Uživatelé</span></h3>
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="row">
+
+                            <div class="col-lg-12 chart-grid">
+                                <div class="text-center">
+                                    <h1>Administrace uživatel</h1>
+
+                                    <blockquote class="blockquote text-center">
+                                        <p class="mb-0">Zde můžete spravovat uživatele</p>
+                                        <footer class="blockquote-footer">
+                                            <cite title="Source Title">Správce</cite>
+                                        </footer>
+                                    </blockquote>
+
+                                    <div class="clearfix"><br/></div>
+
+                                    <div class="row">
+                                        <div class="offset-10 col-2 float-end text-end">
+                                            <button type="button" class="btn button-color-green" data-toggle="modal"
+                                                    data-target="#modal_addUser">
+                                                <i class="fa fa-plus-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="clearfix"><br></div>
+
+                                    <div id="usersTable">
+                                        {include ../admin/tables/userTable.latte}
+                                    </div>
+
+                                    <script>
+                                        $(document).on('click', '[data-delete-user]', function()
+                                            {
+                                                $.get({\Classes\StaticFunctions::getCurrentURL()} + '/ajax/deleteUser',
+                                                    {
+                                                        id: $(this).data('deleteUser')
+                                                    }, function(data)
+                                                    {
+                                                        console.log(data);
+                                                        $('#usersTable').html(data);
+                                                    }
+
+                                                );
+                                            }
+                                        );
+
+                                        $(document).on('change', '[data-change-permission]', function()
+                                            {
+                                                $.get({\Classes\StaticFunctions::getCurrentURL()} + '/ajax/changePermission',
+                                                    {
+                                                        id: $(this).data('change-permission'),
+                                                        permission: $(this).val()
+                                                    }, function(data)
+                                                    {
+                                                        createAlert('OK', 'Práva byla změněna', 'success');
+                                                        $('#usersTable').html(data);
+                                                    }
+
+                                                );
+                                            }
+                                        );
+
+                                        $(function() {
+                                            $(document).on('input', '[data-change-personal-number]', function()
+                                            {
+                                                clearTimeout($(this).data('typingTimer'));
+                                                let id = $(this).data('change-personal-number');
+                                                let personalNumber = $(this).val();
+                                                let timer = setTimeout(function()
+                                                    {
+                                                        $.get({\Classes\StaticFunctions::getCurrentURL()} + '/ajax/changePersonalNumber',
+                                                            {
+                                                                id: id,
+                                                                personalNumber: personalNumber
+                                                            }, function(data)
+                                                            {
+                                                                createAlert('OK', 'Osobní číslo bylo změněno', 'success');
+                                                                $('#usersTable').html(data);
+                                                            }
+
+                                                        );
+                                                    }, 5000
+                                                );
+
+                                                $(this).data('typingTimer', timer);
+                                            }).on('keydown', function()
+                                                {
+                                                    clearTimeout($(this).data('typingTimer'));
+                                                }
+                                            );
+                                        });
+
+                                    </script>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{/block}
+  

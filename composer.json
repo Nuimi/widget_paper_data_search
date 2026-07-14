@@ -1,0 +1,17 @@
+{
+    "require": {
+        "dibi/dibi": "^5.0",
+        "latte/latte": "^2.6",
+        "tracy/tracy": "^2.7",
+        "phpmailer/phpmailer": "^6.1",
+        "ext-json": "*",
+        "raiym/instagram-php-scraper": "^0.12.8",
+        "phpfastcache/phpfastcache": "^9.1",
+        "guzzlehttp/guzzle": "^7.5",
+      "ext-curl": "*",
+        "doctrine/orm": "3.3.1",
+        "symfony/cache": "^7.2",
+        "phpoffice/phpspreadsheet": "^4.0",
+      "ext-ldap": "*"
+    }
+}

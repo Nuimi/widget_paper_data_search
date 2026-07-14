@@ -1,0 +1,243 @@
+{varType bool $select2}
+{varType array $userData}
+
+<!DOCTYPE html>
+<html lang="cz" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Administrace</title>
+
+
+{*        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/css/bootstrap/bootstrap-5.3.3.min.css">*}
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/css/style-starter.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/css/dark-style.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/css/style.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/css/my.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/css/froala_editor.pkgd.min.css">
+        <link rel="stylesheet" href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/fonts/font-awesome-6/css/all.min.css">
+
+        {if $select2}
+            <link href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/css/select2.css" rel="stylesheet"/>
+            <link href="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/css/select2-bootstrap.css" rel="stylesheet"/>
+        {/if}
+
+        <link href="//fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900&display=swap" rel="stylesheet">
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/jquery-3.3.1.min.js"></script>
+
+    </head>
+    <body class="sidebar-menu-collapsed">
+        {include ../sharedAssets/latte/modals.latte}
+
+        <div class="loader hidden" id="loader-page">
+            <img src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/images/Preloader_2.gif" alt="loading">
+        </div>
+
+        <div class="se-pre-con"></div>
+        <section>
+            <div class="sidebar-menu sticky-sidebar-menu">
+                <div class="logo">
+                    <h1><a href="/">Menu</a></h1>
+                </div>
+
+                <!-- if logo is image enable this -->
+                <!-- image logo --
+                <div class="logo">
+                  <a href="index.html">
+                    <img src="image-path" alt="Your logo" title="Your logo" class="img-fluid" style="height:35px;" />
+                  </a>
+                </div>
+                <-- //image logo -->
+
+                <div class="logo-icon text-center">
+                    <a href="{\Classes\StaticFunctions::getCurrentURL()}/admin/" title="logo">
+                        <img src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/images/logo.png" alt="logo-icon">
+                    </a>
+                </div>
+                <!-- //logo end -->
+
+                {include forms/menu.latte}
+
+            </div>
+            <div class="header sticky-header">
+                <div class="menu-right">
+                    <div class="navbar user-panel-top">
+                        <div class="user-dropdown-details d-flex">
+                            <div class="profile_details">
+                                <ul>
+                                    <li>
+                                        <button type="button" class="btn button-color-white" data-dl-toggle id="theme-toggle">
+                                            <i class="fa fa-sun" id="theme-icon"></i>
+                                        </button>
+                                    </li>
+                                    <li class="dropdown profile_details_drop">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="dropdownMenu3" aria-haspopup="true"
+                                           aria-expanded="false">
+                                            <div class="profile_img">
+                                                <i class="fa fa-user" style="font-size: 30px;"></i>
+                                                <div class="user-active">
+                                                    <span></span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <ul class="dropdown-menu drp-mnu" aria-labelledby="dropdownMenu3">
+                                            <li class="user-info">
+                                                <h5 class="user-name">
+                                                    xxxxxxxxxxx
+                                                </h5>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {include body}
+            {include ../sharedAssets/latte/message.latte}
+        </section>
+
+        <footer class="dashboard">
+            <p>&copy 2022 UHK Employees. All Rights Reserved | ReDesign by Nuimi</p>
+        </footer>
+        <button onclick="topFunction()" id="movetop" class="bg-primary" title="Go to top">
+            <span class="fa fa-angle-up"></span>
+        </button>
+        <script>
+
+
+            let documentTheme = document.documentElement.getAttribute('data-bs-theme');
+            if (getCookie('theme'))
+            {
+                documentTheme = getCookie('theme');
+            }
+            toggleTheme();
+
+            $(document).on('click', '[data-dl-toggle]', function()
+                {
+                    documentTheme = documentTheme === 'light' ? 'dark' : 'light';
+                    toggleTheme();
+                }
+            );
+
+            function toggleTheme()
+            {
+                deleteCookie('theme');
+                let button = $('#theme-toggle');
+                let icon = $('#theme-icon');
+                if (documentTheme === 'dark' )
+                {
+                    icon.addClass('fa-sun');
+                    button.addClass('button-color-white');
+                    button.removeClass('button-color-black');
+                    icon.removeClass('fa-moon');
+                    setCookie('theme', 'dark');
+                } else {
+                    icon.removeClass('fa-sun');
+                    button.removeClass('button-color-white');
+                    icon.addClass('fa-moon');
+                    button.addClass('button-color-black');
+                    setCookie('theme', 'light');
+                }
+                document.documentElement.setAttribute('data-bs-theme', documentTheme);
+            }
+
+            function setCookie(name, value)
+            {
+                let expires = "";
+                let days = 1;
+                let date = new Date();
+                date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+                expires = "; expires=" + date.toUTCString();
+                document.cookie = name + "=" + value + "; path=/" + expires;
+            }
+
+            function getCookie(name)
+            {
+                let cookies = document.cookie.split("; ");
+                for (let cookie of cookies)
+                {
+                    let [key, value] = cookie.split("=");
+                    if (key === name)
+                    {
+                        return value;
+                    }
+                }
+                return null;
+            }
+
+            function deleteCookie(name)
+            {
+                document.cookie = name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+            }
+
+            window.onscroll = function ()
+            {
+                scrollFunction()
+            };
+
+            function scrollFunction()
+            {
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20)
+                {
+                    document.getElementById("movetop").style.display = "block";
+                } else {
+                    document.getElementById("movetop").style.display = "none";
+                }
+            }
+
+            function topFunction()
+            {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/jquery-1.10.2.min.js"></script>
+
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/jquery.nicescroll.js"></script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/scripts.js"></script>
+
+        <script>
+            var closebtns = document.getElementsByClassName("close-grid");
+            var i;
+
+            for (i = 0; i < closebtns.length; i++)
+            {
+                closebtns[i].addEventListener("click", function ()
+                    {
+                        this.parentElement.style.display = 'none';
+                    }
+                );
+            }
+            $(function ()
+                {
+
+                    $('.toggle-btn').trigger('click');
+
+                    $('.sidebar-menu-collapsed').click(function ()
+                        {
+                            $('body').toggleClass('noscroll');
+                        }
+                    )
+                }
+            );
+        </script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/modernizr.js"></script>
+        <script>
+            $(window).load(function ()
+                {
+                    $(".se-pre-con").fadeOut("slow");
+                }
+            );
+        </script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/bootstrap.bundle.min.js"></script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/admin/assets/js/default.js"></script>
+        <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/js/default.js"></script>
+
+
+        {if $select2}
+            <script src="{\Classes\StaticFunctions::getCurrentURL()}/www/sharedAssets/js/select2.js"></script>
+        {/if}
+    </body>
+</html>
