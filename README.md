@@ -159,6 +159,55 @@ The script creates:
 - `/api?q=...` main API query for quartile and metrics lookup
 - `/presenters/api.php?q=...` direct entry point currently used by the browser extension
 
+## Metric display settings
+
+Authenticated users can customize which journal metrics and related classification values are displayed in the application and browser extension. The settings are stored separately for each user and can be changed from the administration page.
+
+Each metric group has a main switch that enables or disables the entire group. Individual values within an enabled group can then be selected separately.
+
+### Available settings
+
+#### JIF
+
+- Category
+- Edition
+- Quartile
+- Rank
+
+#### Impact Metrics
+
+- JIF
+- JIF 5 Years
+- JIF Without Self Citations
+- JCI
+- Immediacy Index
+- Total Cites
+
+#### Article Influence
+
+- Category
+- Edition
+- Quartile
+- Rank
+
+#### Influence Metrics
+
+- Article Influence
+- EigenFactor Score
+- EigenFactor Normalized
+
+#### Source Metrics
+
+- JIF Percentile
+- Citable Items Total
+- Articles Percentage
+- Half Life Cited
+- Half Life Citing
+
+The availability of a particular value may depend on the journal, edition, category, and metrics year returned by the Clarivate API.
+
+Definitions and additional information about the individual Journal Citation Reports metrics are available in the [Clarivate Journal Citation Reports Glossary](https://journalcitationreports.zendesk.com/hc/en-gb/articles/28351666061457-Glossary).
+
 ## Browser extension
 
 The extension source files are located in `www/extension`.
