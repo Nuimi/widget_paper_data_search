@@ -96,12 +96,12 @@ function getRankColumnDefinitions(data, key) {
 function renderSimpleRows(data) {
     const displaySettings = getDisplaySettings(data);
     const rows = [
-        { field: "articleTitle", label: "Název článku", value: data.articleTitle },
-        { field: "journal", label: "Časopis", value: data.journal },
+        { field: "articleTitle", label: "Paper name", value: data.articleTitle },
+        { field: "journal", label: "Journal", value: data.journal },
         { field: "issn", label: "ISSN", value: data.issn },
-        { field: "year", label: "Rok článku", value: data.year },
-        { field: "metricsYear", label: "Rok metrik", value: data.metricsYear },
-        { field: "source", label: "Zdroj", value: data.source },
+        { field: "year", label: "Paper year", value: data.year },
+        { field: "metricsYear", label: "Metric year", value: data.metricsYear },
+        { field: "source", label: "Source", value: data.source },
         { field: "doi", label: "DOI", value: data.doi },
         { field: "jif", label: "JIF", value: data.jif },
         { field: "jif5Years", label: "JIF 5 Years", value: data.jif5Years },
@@ -152,7 +152,7 @@ function renderRankTable(title, rows, columns) {
         return `
             <div class="metric-block">
                 <h4>${escapeHtml(title)}</h4>
-                <div>Žádná data</div>
+                <div>No data foud</div>
             </div>
         `;
     }
@@ -185,7 +185,7 @@ function renderAllMetrics(data) {
     if (!el) return;
 
     if (!data) {
-        el.innerHTML = "<div>Žádná data</div>";
+        el.innerHTML = "<div>No data found</div>";
         return;
     }
 
@@ -247,7 +247,7 @@ function extractJournalName(data) {
         (typeof data.journal === "string" ? data.journal : null) ||
         journalData?.hits?.[0]?.name ||
         qData?.journal?.name ||
-        "Neznámý časopis"
+        "Unknow journal"
     );
 }
 
@@ -303,7 +303,7 @@ async function renderResult() {
     const metricsEl = document.getElementById("metrics");
 
     if (!lastResult) {
-        articleTitleEl.textContent = "Zatím žádný výsledek";
+        articleTitleEl.textContent = "Nothing found yet";
         journalNameEl.textContent = "";
         issnEl.textContent = DASH;
         sourceEl.textContent = DASH;
@@ -339,12 +339,12 @@ async function renderResult() {
 
     renderAllMetrics(lastResult);
 
-    articleTitleEl.textContent = articleTitle || "Nenalezen název článku";
-    journalNameEl.textContent = journalName ? `Časopis: ${journalName}` : "";
+    articleTitleEl.textContent = articleTitle || "Paper title not found";
+    journalNameEl.textContent = journalName ? `Journal: ${journalName}` : "";
     issnEl.textContent = issn || DASH;
     sourceEl.textContent = source || DASH;
     yearEl.textContent = metricsYear
-        ? `Metriky ${metricsYear}${year && year !== metricsYear ? `, článek ${year}` : ""}`
+        ? `Metrics ${metricsYear}${year && year !== metricsYear ? `, paper ${year}` : ""}`
         : (year ? String(year) : "");
 
     const q = (quartile || DASH).toUpperCase();
@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             errorBox.textContent = "";
 
             if (!login || !password) {
-                errorBox.textContent = "Vyplň login i heslo.";
+                errorBox.textContent = "Fill login and password.";
                 errorBox.style.display = "block";
                 return;
             }
@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (!result.ok || !result.data?.token) {
                     await removeStorage(["token"]);
-                    errorBox.textContent = result.data?.message || "Přihlášení selhalo.";
+                    errorBox.textContent = result.data?.message || "Unknown error.";
                     errorBox.style.display = "block";
                     return;
                 }
@@ -425,7 +425,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 showResultView();
                 await renderResult();
             } catch (error) {
-                errorBox.textContent = "Nepodařilo se spojit se serverem.";
+                errorBox.textContent = "Connection to the server failed.";
                 errorBox.style.display = "block";
                 console.error(error);
             }

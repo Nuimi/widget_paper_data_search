@@ -212,7 +212,7 @@ class DefaultClass
 
         if (!$this->checkLoggedIn())
         {
-            SF::addErrorMessage('Je potřeba se přihlásit');
+            SF::addErrorMessage('You need to log in');
             SF::setHeader('/user/signIn');
         }
     }

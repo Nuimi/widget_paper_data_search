@@ -30,7 +30,7 @@ class User extends \Classes\DefaultClass
             {
                 $this->logIn($existed);
             } else {
-                SF::addErrorMessage('Heslo je chybné');
+                SF::addErrorMessage('Wrong password');
             }
         } else {
             $this->container->getUserFacade()->createUser($email);
@@ -45,7 +45,7 @@ class User extends \Classes\DefaultClass
         $data->setLast(new \Classes\DateTimeUtil());
         $this->container->getUserManager()->saveEntity($data);
         new \Classes\UserData($data->getEmail(), $data->getId(), $data->getToken(), $data->getPermission());
-        SF::addSuccessMessage('Byl jste úspěšně přihlášen');
+        SF::addSuccessMessage('Login was successful');
         SF::setHeader('/admin');
     }
 }

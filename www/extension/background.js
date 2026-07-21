@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "qQuartileLookup",
-        title: "Zjistit kvartil (Q1–Q4)",
+        title: "Find out quartile (Q1–Q4)",
         contexts: ["selection"],
     });
 });

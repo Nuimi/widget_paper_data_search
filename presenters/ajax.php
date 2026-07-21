@@ -13,12 +13,12 @@ class Ajax extends DefaultClass
 
         $response = [
             'token' => null,
-            'message' => 'Neplatné přihlašovací údaje.'
+            'message' => 'Wrong credentials.'
         ];
 
         if (!is_null($existed))
         {
-            if ($existed->getEmail() == 'vondrda3@uhk.cz' && $this->getParameter('password') == 'Dd123456')
+            if ($existed->getEmail() == 'vondrda3@uhk.cz' && $this->getParameter('password') == 'Dd123456' && LOCALE)
             {
                 $response = [
                     'token' => $existed->getToken(),

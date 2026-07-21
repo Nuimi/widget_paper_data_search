@@ -35,11 +35,11 @@ class Admin extends \Classes\DefaultClass
                     $mySettings->setSettings(json_encode($data));
                 }
                 $this->container->getSettingsManager()->saveEntity($mySettings);
-                SF::addSuccessMessage('Nastavení bylo upraveno');
+                SF::addSuccessMessage('Setting was updated');
                 SF::setHeader('/admin');
             } else {
                 $this->container->getSettingsManager()->deleteMy();
-                SF::addSuccessMessage('Nastavení bylo vráceno do původního nastavení');
+                SF::addSuccessMessage('Setting was updated to default settings');
                 SF::setHeader('/admin');
             }
         }
