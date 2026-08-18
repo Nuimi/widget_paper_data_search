@@ -234,8 +234,21 @@ function extractQuartile(data) {
 
 function extractArticleTitle(data) {
     if (!data) return null;
-
-    return data.articleTitle || data.title || data.input || null;
+    if (data.isWoS)
+    {
+        document.getElementById('grid_data').style.display = '';
+        document.getElementById('allMetrics').style.display = '';
+        document.getElementById('metricsWrap').style.display = '';
+        document.getElementById('pillQuartile').style.display = '';
+        return 'Paper is indexed in WoS' || null;
+    } else {
+        document.getElementById('grid_data').style.display = 'none';
+        document.getElementById('allMetrics').style.display = 'none';
+        document.getElementById('metricsWrap').style.display = 'none';
+        document.getElementById('pillQuartile').style.display = 'none';
+        return 'Paper is not indexed in WoS' || null;
+    }
+    // return data.articleTitle || data.title || data.input || null;
 }
 
 function extractJournalName(data) {
@@ -355,7 +368,10 @@ async function renderResult() {
 
     if (metrics) {
         metricsEl.textContent = JSON.stringify(metrics, null, 2);
-        metricsWrap.style.display = "";
+        if (lastResult.isWoS)
+        {
+            metricsWrap.style.display = "";
+        }
     } else {
         metricsWrap.style.display = "none";
     }

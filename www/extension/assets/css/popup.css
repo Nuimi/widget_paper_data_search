@@ -259,4 +259,7 @@ body {
 .table-wrap {
   overflow-x: auto;
 }
+.hidden {
+  display: none;
+}
 /*# sourceMappingURL=popup.css.map */

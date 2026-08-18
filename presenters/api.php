@@ -725,6 +725,7 @@ if (!empty($qData['ranks']['jif'][0]['quartile'])) {
 }
 
 $response = [
+    'isWoS' => $q == $articleTitle,
     'input' => $q,
     'articleTitle' => $articleTitle,
     'doi' => $work['ids']['doi'] ?? getDoi($q),

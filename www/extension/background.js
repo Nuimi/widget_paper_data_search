@@ -19,6 +19,17 @@ async function openPopupIfSupported(tab) {
     }
 }
 
+async function clearBadge(tabId) {
+    if (!tabId) {
+        return;
+    }
+
+    await chrome.action.setBadgeText({
+        text: "",
+        tabId,
+    });
+}
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId !== "qQuartileLookup") return;
 
@@ -52,12 +63,20 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         const data = JSON.parse(raw);
         await chrome.storage.local.set({ lastResult: data });
 
+        if (data?.isWoS === false) {
+            await clearBadge(tab?.id);
+            await openPopupIfSupported(tab);
+            return;
+        }
+
         const quartile = extractQuartile(data);
         if (quartile && tab?.id) {
             await chrome.action.setBadgeText({
                 text: quartile.toUpperCase(),
                 tabId: tab.id,
             });
+        } else {
+            await clearBadge(tab?.id);
         }
 
         await openPopupIfSupported(tab);
