@@ -12,6 +12,7 @@
         "doctrine/orm": "3.3.1",
         "symfony/cache": "^7.2",
         "phpoffice/phpspreadsheet": "^4.0",
-      "ext-ldap": "*"
+      "ext-ldap": "*",
+      "ext-pdo": "*"
     }
 }

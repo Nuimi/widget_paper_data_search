@@ -1,3 +1,25 @@
+importScripts('client.js');
+
+const ready = chrome.storage.local.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
+const client = createQFinderClient({
+    storage: chrome.storage.local,
+    onSession: async expiresAt => {
+        await chrome.alarms.clear('token-expiry');
+        if (expiresAt) {
+            await chrome.alarms.create('token-expiry', { when: expiresAt * 1000 });
+        } else {
+            await chrome.action.setBadgeText({ text: '' });
+            for (const tab of await chrome.tabs.query({})) {
+                try { await chrome.action.setBadgeText({ text: '', tabId: tab.id }); } catch { /* Tab closed during cleanup. */ }
+            }
+        }
+    },
+});
+chrome.alarms.onAlarm.addListener(async alarm => {
+    if (alarm.name === 'token-expiry') { await ready; await client.status(); }
+});
+chrome.runtime.onStartup.addListener(async () => { await ready; await client.status(); });
+
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "qQuartileLookup",
@@ -30,59 +52,50 @@ async function clearBadge(tabId) {
     });
 }
 
+async function runLookup(query, tab) {
+    const result = await client.lookup(query);
+    if (result.cancelled) return result;
+    const quartile = result.ok ? extractQuartile(result.data) : null;
+    if (tab?.id) {
+        await chrome.action.setBadgeText({ text: quartile ? quartile.toUpperCase() : '', tabId: tab.id });
+    }
+    return result;
+}
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (info.menuItemId !== "qQuartileLookup") return;
-
-    const query = info.selectionText?.trim();
-    if (!query) return;
-
-    const { token } = await chrome.storage.local.get(["token"]);
-    const params = new URLSearchParams({ q: query });
-
-    if (token) {
-        params.set("token", token);
-    }
-
-    const url = `https://imitweby.uhk.cz/widget/presenters/api.php?${params.toString()}`;
-
+    if (info.menuItemId !== 'qQuartileLookup') return;
+    await ready;
     try {
-        const response = await fetch(url, { method: "GET" });
-        const contentType = response.headers.get("content-type") || "";
-        const raw = await response.text();
-
-        if (!response.ok) {
-            console.log(`HTTP ${response.status}`);
-        }
-
-        if (!contentType.includes("application/json")) {
-            console.log("Response is not JSON");
-            console.log(raw.slice(0, 500));
-            return;
-        }
-
-        const data = JSON.parse(raw);
-        await chrome.storage.local.set({ lastResult: data });
-
-        if (data?.isWoS === false) {
-            await clearBadge(tab?.id);
-            await openPopupIfSupported(tab);
-            return;
-        }
-
-        const quartile = extractQuartile(data);
-        if (quartile && tab?.id) {
-            await chrome.action.setBadgeText({
-                text: quartile.toUpperCase(),
-                tabId: tab.id,
-            });
-        } else {
-            await clearBadge(tab?.id);
-        }
-
-        await openPopupIfSupported(tab);
+        const result = await runLookup(info.selectionText, tab);
+        if (result.error && !result.authRequired && !result.cancelled) await chrome.storage.local.set({ lastResult: { error: result.error } });
     } catch (error) {
-        console.log(error);
+        console.warn('Q-Finder extension operation failed', { type: error?.name || 'Error' });
+        await clearBadge(tab?.id);
+        await chrome.storage.local.set({ lastResult: { error: 'The extension could not complete the operation. Reload the extension and retry.' } });
     }
+    await openPopupIfSupported(tab);
+});
+
+chrome.runtime.onMessage.addListener((message, sender, respond) => {
+    // Only extension pages may initiate authenticated operations, never content scripts.
+    if (sender.id !== chrome.runtime.id || sender.tab || !sender.url?.startsWith(chrome.runtime.getURL(''))) return;
+    if (!['AUTH_STATUS', 'AUTH_LOGIN', 'AUTH_LOGOUT', 'LOOKUP'].includes(message?.type)) return;
+    (async () => {
+        await ready;
+        switch (message.type) {
+            case 'AUTH_STATUS': return client.status();
+            case 'AUTH_LOGIN': return client.login(message.login, message.password);
+            case 'AUTH_LOGOUT': return client.logout();
+            case 'LOOKUP': {
+                const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                return runLookup(message.query, tab);
+            }
+        }
+    })().then(respond, error => {
+        console.warn('Q-Finder extension operation failed', { type: error?.name || 'Error' });
+        respond({ error: 'The extension could not complete the operation. Reload the extension and retry.' });
+    });
+    return true;
 });
 
 function extractQuartile(data) {

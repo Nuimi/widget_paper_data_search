@@ -1,6 +1,6 @@
 # WOS Widget / Q-Quartile Finder
 
-**Current Version:** `1.0`
+**Current Version:** `1.1.0`
 
 Web application and companion browser extension for quickly retrieving journal quartiles and related bibliometric metrics. The project looks up a DOI or text query, resolves the record through OpenAlex, and then enriches it with metrics from the Clarivate Web of Science Journals API.
 
@@ -10,8 +10,9 @@ Web application and companion browser extension for quickly retrieving journal q
 - resolves the journal, ISSN, publication year, and metrics year
 - displays the `Q1-Q4` quartile and additional metrics such as `JIF`, `JCI`, `Article Influence`, or `EigenFactor`
 - stores user preferences for which metrics should be displayed
-- authenticates users through LDAP and assigns each user their own API token
-- serves a Chrome/Chromium extension that can read DOI values from a page and trigger searches from the context menu
+- caches source responses in the existing MySQL/MariaDB database
+- authenticates users through LDAP and issues a separate expiring, revocable API token for each extension login
+- serves a Chrome/Chromium extension that can read DOI values from a page and trigger searches from the context menu or a manual title/DOI field in the popup
 
 ## Technology stack
 
@@ -33,6 +34,7 @@ Web application and companion browser extension for quickly retrieving journal q
 - PHP extension `curl`
 - PHP extension `json`
 - PHP extension `ldap`
+- PHP extension `pdo_mysql`
 - write access to `cache` and `tmp`
 - access to the OpenAlex API
 - valid `WOS_API_KEY`
@@ -141,10 +143,10 @@ The script creates:
 
 ## Data flow
 
-1. The user enters a DOI or a text query.
-2. `presenters/api.php` calls OpenAlex and tries to resolve the matching record.
+1. The authenticated user selects text in the context menu or submits an article title/DOI in the popup.
+2. `presenters/api.php` validates the bearer token, then resolves the record through the shared cache or OpenAlex.
 3. The application extracts the ISSN and publication year from the result.
-4. It then calls the Clarivate Web of Science API using the ISSN.
+4. It retrieves cached Clarivate responses or calls the Web of Science APIs using the ISSN and report year.
 5. The application returns the quartile, bibliometric metrics, and optional user display settings.
 
 ## Main URLs and endpoints
@@ -155,9 +157,10 @@ The script creates:
 - `/admin` administration page for user metric display settings
 - `/admin/saveSettings` saves or resets settings
 - `/ajax/logIn` JSON login for the browser extension
-- `/ajax/userSettings?token=...` returns saved settings for a given token
-- `/api?q=...` main API query for quartile and metrics lookup
-- `/presenters/api.php?q=...` direct entry point currently used by the browser extension
+- `/ajax/userSettings` returns saved settings with an `Authorization: Bearer <token>` header
+- `POST /ajax/revokeToken` permanently revokes the supplied bearer token
+- `/api?q=...` main API query for quartile and metrics lookup (bearer authentication required)
+- `/presenters/api.php?q=...` direct entry point used by both extension search workflows (bearer authentication required)
 
 ## Metric display settings
 
@@ -246,7 +249,7 @@ From the codebase, the application clearly works with at least these tables:
 - `tUser`
 - `tSettings`
 
-`tUser` stores the email, token, status, permissions, and the timestamp of the last action. `tSettings` stores a JSON payload with metric display preferences bound to a specific user through `FK_userID`.
+`tUser` stores the email, legacy token field, status, permissions, and the timestamp of the last action. `tApiToken` stores the hashes and lifecycle timestamps of active extension sessions. `tSettings` stores a JSON payload with metric display preferences bound to a specific user through `FK_userID`.
 
 ## Operational notes
 
@@ -259,14 +262,81 @@ From the codebase, the application clearly works with at least these tables:
 
 - Production configuration is not versioned in the repository, which is correct. Do not commit keys or passwords.
 - The code contains a hardcoded special login exception in `presenters/user.php` and `presenters/ajax.php`. I strongly recommend removing it before production deployment.
-- In `presenters/api.php`, SSL verification is disabled for some cURL requests. If your environment allows it, standard certificate validation should be re-enabled.
+- All upstream HTTPS calls verify the certificate and hostname. Windows uses the native trust store when supported; other systems use PHP/cURL defaults. An explicit `UPSTREAM_CA_BUNDLE` can select a trusted PEM bundle.
 
 ## Development and maintenance
 
 - PHP dependencies are defined in `composer.json`.
 - The Node side is minimal, and `package.json` currently only contains Chrome API type support.
-- There are currently no automated tests in the project, so after larger changes it is best to manually verify login, `/api`, `/ajax/userSettings`, and the browser extension.
+- Run the automated regression checks listed below; also verify institutional services and the browser extension in staging.
 
 ## License
 
 Usage terms are described in `Licence.txt`. A Czech version is also available in `Licence_CZ.txt`. The repository is currently documented conservatively as proprietary software because the codebase did not previously declare a clear open-source license.
+
+## Upgrading to 1.1.0
+
+The revision adds shared MySQL/MariaDB caching, expiring/revocable extension sessions, and manual popup search. It reuses the existing database and PDO MySQL driver; no additional cache service or cache-specific PHP extension is required. This is a simpler deployment choice for the small number of users and low search volume currently anticipated at the university. Higher user/search counts could justify a future Redis-based version after measuring database load and cache effectiveness; no such backend is implemented or required now.
+
+Deploy the backend and extension together. Old extension tokens in `tUser.token` are no longer accepted; users must sign in again. The old column remains for compatibility with existing user records and web administration. Include new files when transferring this revision: `classes/security/apiToken.php`, `classes/MySqlCache.php`, both SQL migrations, `config/cache.example.php`, and `www/extension/client.js`. Files marked `??` by Git are not included in a patch of tracked files.
+
+1. Import `database/migrations/001_api_tokens.sql` and `database/migrations/002_lookup_cache.sql` into the configured application database. New installations use `database/schema.sql` instead. These additive migrations create `tApiToken` and `tLookupCache` and preserve users/settings.
+2. Enable PHP `pdo_mysql`. Cache and token persistence use the existing `DB_HOST`, `DB_USERNAME`, `DB_PASSWORD`, and `DB_DATABASE` settings, with optional `DB_PORT` (default 3306). All backend workers must connect to the same database server for named-lock coordination. The runtime database account needs SELECT/INSERT/UPDATE/DELETE access to the new tables; table creation belongs to deployment.
+3. Copy the definitions from `config/cache.example.php` into private `config/config.php` if you want explicit overrides. Code defaults are:
+
+```php
+define('LOOKUP_CACHE_NAMESPACE', 'qfinder:v1:');
+define('OPENALEX_CACHE_TTL_SECONDS', 3600);
+define('WOS_CACHE_TTL_SECONDS', 86400);
+define('API_TOKEN_TTL_SECONDS', 28800);
+```
+
+4. Serve the backend over HTTPS and preserve Authorization headers through proxies/FastCGI. The Apache `.htaccess` includes forwarding. Load/distribute the updated `www/extension` directory and sign in again. Other deployments must adjust `base` in `www/extension/client.js` and the settings link in `index.html` from the current institutional URL.
+5. Verify institutional login, both search entry points, expiry, revocation, and repeated-query cache reuse in staging. The automated tests do not authenticate against institutional LDAP or consume licensed API quotas.
+
+### OpenAlex access and HTTPS troubleshooting
+
+Copy the optional settings from `config/upstream.example.php` into private `config/config.php`. Set `OPENALEX_API_KEY` to your own key from [OpenAlex settings](https://openalex.org/settings/api). It is sent only by the backend in an Authorization header, never to the extension or in a cache key. According to the [current authentication documentation](https://help.openalex.org/api/authentication/), basic anonymous use is supported with a smaller budget; anonymous search can also be paused during service overload. A server key is recommended for deployment.
+
+The XAMPP CA bundle can be outdated. `classes/UpstreamHttp.php` enables Windows native certificate trust when available, keeping certificate and hostname verification enabled for both OpenAlex and Clarivate. For a custom trust store, set `UPSTREAM_CA_BUNDLE` to an existing, trusted PEM file; otherwise maintain PHP's `curl.cainfo`/system trust store. Never work around a certificate error by disabling TLS verification.
+
+The popup distinguishes upstream TLS, connection, timeout, authentication, quota and service errors. These use HTTP 502/503/504, so an upstream authentication problem does not log the widget user out. Server logs include only provider, reason, HTTP status and cURL error number, without API keys, URLs or response bodies. Failed requests are not cached.
+
+Run `php tests/upstream.php` for offline error-handling checks. To diagnose the actual server connection, run `php tests/upstream.php --live`: it calls OpenAlex once by DOI and once by title using the private server key if configured. It does not access LDAP, the database or Clarivate. Deploy `classes/UpstreamHttp.php` with the updated presenter.
+
+### Cache behavior
+
+`tLookupCache` stores `cacheKey` (SHA-256), `payload` (JSON text), and `expiresAt` (Unix seconds), with indexes on the key and expiry. Keys include namespace and full upstream request identity; Clarivate identities also contain a hash of the API credential. API credentials, user tokens, and personal display settings are not stored in the cached payload. Settings are loaded and applied separately for each authenticated request.
+
+Entries expire after one hour for OpenAlex and 24 hours for Clarivate by default. Empty successful responses and Clarivate 404 responses are cached for at most five minutes. Expiry is checked on every read using the database clock. Each miss removes at most 100 expired rows; no background service is required. For periodic housekeeping, a database administrator may additionally run `DELETE FROM tLookupCache WHERE expiresAt <= UNIX_TIMESTAMP() LIMIT 1000` on a schedule. Expired rows retained between cleanups are never served. Change `LOOKUP_CACHE_NAMESPACE` to invalidate active entries without touching users or settings.
+
+For a miss, MySQL/MariaDB `GET_LOCK` coordinates the same resource across connections, waits up to one second, and is followed by another cache check. The lock is released in `finally` or automatically on connection termination. No transaction is held open during the external request. Contention and cache database failures return HTTP 503 rather than an uncached API fallback. Transient errors and malformed payloads are not cached as successful results. Individual upstream calls have a 20-second timeout. This implementation targets one shared database server, not coordination across independent database nodes.
+
+### Token lifecycle and popup search
+
+Each successful LDAP login creates a random 256-bit bearer token with an absolute eight-hour lifetime by default. `tApiToken` stores only its SHA-256 hash, user ID, issuance/expiry time and revocation time. Every settings/lookup request validates these records and active account status before using cache or external services. Login returns `token`, `expiresAt` (Unix seconds), and `expiresIn`; token transport uses `Authorization: Bearer`, never query URLs. Extension storage is restricted to trusted extension contexts. Local checks and an alarm clear expired data, while the backend enforces expiry regardless of browser state.
+
+`POST /ajax/revokeToken` idempotently revokes the supplied session. Logout clears local data after server confirmation; failures remain visible and can be retried. Results from a session ended during lookup are discarded. Web administration PHP sessions remain separate. Administrators can revoke a user's token rows or disable the account (`tUser.state = 0`).
+
+The popup accepts article titles/DOIs, submitted with Search or Enter. Typing alone does not query an API. Empty/oversized queries and duplicate pending requests are rejected. Both popup and context-menu searches use the same authenticated service-worker handler. The limit is 2000 UTF-8 bytes. OCR and dedicated journal-title matching are not implemented; retrieved journal metrics do not prove that the individual article is indexed in WoS.
+
+### Regression checks
+
+```sh
+php tests/backend.php
+php tests/upstream.php
+node --test tests/extension.cjs
+```
+
+Token unit checks use SQLite (`pdo_sqlite` needed only for these tests). Extension tests use simulated HTTP/storage and a popup DOM harness. To exercise the real database cache and token SQL on an isolated MySQL/MariaDB server, use PowerShell:
+
+```powershell
+$env:QF_TEST_MYSQL_DSN = 'mysql:host=127.0.0.1;port=33379;charset=utf8mb4'
+$env:QF_TEST_MYSQL_USER = 'root'
+# Set QF_TEST_MYSQL_PASSWORD if the test server requires it.
+php tests/mysql.php
+```
+
+This suite never reads private application credentials. It creates a random `qfinder_test_*` schema, applies the shipped schema and migrations, checks separate connections, cache expiry, negative results, contention, errors and token revocation, and drops only its own test schema. Its test account needs CREATE/DROP DATABASE privileges. Tests do not establish production capacity; LDAP, licensed upstream services and real browser deployment still require institutional verification.
+
+The MySQL suite also runs the actual lookup/settings/revocation endpoint source in an isolated PHP child process, with seeded cache entries and `curl_init` disabled. This verifies status codes, JSON, current display settings and token enforcement on cache hits without external API calls; it does not test Apache routing or live LDAP.

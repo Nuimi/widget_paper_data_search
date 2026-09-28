@@ -15,14 +15,6 @@ async function getStorage(keys) {
     return await extApi.storage.local.get(keys);
 }
 
-async function setStorage(data) {
-    return await extApi.storage.local.set(data);
-}
-
-async function removeStorage(keys) {
-    return await extApi.storage.local.remove(keys);
-}
-
 function escapeHtml(value) {
     return String(value ?? DASH)
         .replaceAll("&", "&amp;")
@@ -233,22 +225,10 @@ function extractQuartile(data) {
 }
 
 function extractArticleTitle(data) {
-    if (!data) return null;
-    if (data.isWoS)
-    {
-        document.getElementById('grid_data').style.display = '';
-        document.getElementById('allMetrics').style.display = '';
-        document.getElementById('metricsWrap').style.display = '';
-        document.getElementById('pillQuartile').style.display = '';
-        return 'Paper is indexed in WoS' || null;
-    } else {
-        document.getElementById('grid_data').style.display = 'none';
-        document.getElementById('allMetrics').style.display = 'none';
-        document.getElementById('metricsWrap').style.display = 'none';
-        document.getElementById('pillQuartile').style.display = 'none';
-        return 'Paper is not indexed in WoS' || null;
+    for (const id of ['grid_data', 'allMetrics', 'pillQuartile']) {
+        document.getElementById(id).style.display = '';
     }
-    // return data.articleTitle || data.title || data.input || null;
+    return data?.articleTitle || data?.input || null;
 }
 
 function extractJournalName(data) {
@@ -315,6 +295,7 @@ async function renderResult() {
     const metricsWrap = document.getElementById("metricsWrap");
     const metricsEl = document.getElementById("metrics");
 
+    document.getElementById("allMetrics").innerHTML = "";
     if (!lastResult) {
         articleTitleEl.textContent = "Nothing found yet";
         journalNameEl.textContent = "";
@@ -377,81 +358,94 @@ async function renderResult() {
     }
 }
 
-async function loginRequest(login, password) {
-    const response = await fetch("https://imitweby.uhk.cz/widget/ajax/logIn", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        },
-        body: new URLSearchParams({
-            login,
-            password,
-        }).toString(),
-    });
-
-    const data = await response.json();
-    return { ok: response.ok, data };
+async function sendCommand(type, data = {}) {
+    return extApi.runtime.sendMessage({ type, ...data });
 }
 
 async function initPopup() {
-    const { token } = await getStorage(["token"]);
-
-    if (!token) {
+    const status = await sendCommand('AUTH_STATUS');
+    if (!status?.authenticated) {
         showLoginView();
         return;
     }
-
     showResultView();
     await renderResult();
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await initPopup();
+document.addEventListener('DOMContentLoaded', async () => {
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchStatus = document.getElementById('searchStatus');
+    const loginError = document.getElementById('loginError');
 
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
+    loginBtn.addEventListener('click', async () => {
+        const login = document.getElementById('login').value.trim();
+        const passwordInput = document.getElementById('password');
+        const password = passwordInput.value;
+        loginError.style.display = 'none';
+        if (!login || !password) {
+            loginError.textContent = 'Fill login and password.';
+            loginError.style.display = 'block';
+            return;
+        }
+        loginBtn.disabled = true;
+        try {
+            const result = await sendCommand('AUTH_LOGIN', { login, password });
+            if (!result.ok) throw new Error(result.error || 'Login failed.');
+            passwordInput.value = '';
+            showResultView();
+            await renderResult();
+        } catch (error) {
+            loginError.textContent = error.message;
+            loginError.style.display = 'block';
+        } finally { loginBtn.disabled = false; }
+    });
 
-    if (loginBtn) {
-        loginBtn.addEventListener("click", async () => {
-            const login = document.getElementById("login").value.trim();
-            const password = document.getElementById("password").value;
-            const errorBox = document.getElementById("loginError");
+    logoutBtn.addEventListener('click', async () => {
+        logoutBtn.disabled = true;
+        try {
+            const result = await sendCommand('AUTH_LOGOUT');
+            if (!result.ok) throw new Error(result.error || 'Could not log out. Please retry.');
+            searchStatus.textContent = '';
+            document.getElementById('searchQuery').value = '';
+            showLoginView();
+        } catch (error) {
+            searchStatus.textContent = error.message;
+        } finally { logoutBtn.disabled = false; }
+    });
 
-            errorBox.style.display = "none";
-            errorBox.textContent = "";
-
-            if (!login || !password) {
-                errorBox.textContent = "Fill login and password.";
-                errorBox.style.display = "block";
+    document.getElementById('searchForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        if (searchBtn.disabled) return;
+        searchBtn.disabled = true;
+        searchStatus.textContent = 'Searching…';
+        document.getElementById('allMetrics').innerHTML = '';
+        document.getElementById('metricsWrap').style.display = 'none';
+        document.getElementById('articleTitle').textContent = 'Searching…';
+        document.getElementById('pillQuartile').textContent = DASH;
+        try {
+            const result = await sendCommand('LOOKUP', { query: document.getElementById('searchQuery').value });
+            if (result.authRequired) {
+                showLoginView();
+                loginError.textContent = result.error;
+                loginError.style.display = 'block';
                 return;
             }
+            if (!result.ok) throw new Error(result.error || 'Lookup failed.');
+            searchStatus.textContent = result.data.isWoS ? '' : 'No journal metrics found for this match.';
+            await renderResult();
+        } catch (error) {
+            searchStatus.textContent = error.message;
+            document.getElementById('articleTitle').textContent = 'Search was not completed';
+        } finally { searchBtn.disabled = false; }
+    });
 
-            try {
-                const result = await loginRequest(login, password);
-
-                if (!result.ok || !result.data?.token) {
-                    await removeStorage(["token"]);
-                    errorBox.textContent = result.data?.message || "Unknown error.";
-                    errorBox.style.display = "block";
-                    return;
-                }
-
-                await setStorage({ token: result.data.token });
-
-                showResultView();
-                await renderResult();
-            } catch (error) {
-                errorBox.textContent = "Connection to the server failed.";
-                errorBox.style.display = "block";
-                console.error(error);
-            }
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-            await removeStorage(["token", "lastResult"]);
-            showLoginView();
-        });
-    }
+    extApi.storage.onChanged.addListener(async (changes, area) => {
+        if (area !== 'local') return;
+        if (changes.token && !changes.token.newValue) showLoginView();
+        if (changes.lastResult) await renderResult();
+    });
+    try { await initPopup(); }
+    catch { showLoginView(); }
 });

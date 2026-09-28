@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="cs">
+<html lang="en">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -63,6 +63,14 @@
 
                 <main class="content">
                     <section class="card">
+                        <form id="searchForm">
+                            <label for="searchQuery">Article title or DOI</label>
+                            <input id="searchQuery" type="search" maxlength="2000" required placeholder="Type or paste a title or DOI" />
+                            <button id="searchBtn" class="btn" type="submit">Search</button>
+                        </form>
+                        <div id="searchStatus" class="hint" role="status" aria-live="polite"></div>
+                    </section>
+                    <section class="card">
                         <div class="titleRow">
                             <div>
                                 <h1 class="title" id="articleTitle">nothing found yet</h1>
@@ -83,7 +91,7 @@
                         </div>
 
                         <div class="hint" id="hint">
-                            Choose text or DOI and use context menu.
+                            Enter an article title or DOI above, or select text and use the context menu.
                         </div>
                     </section>
                     <div id="allMetrics"></div>

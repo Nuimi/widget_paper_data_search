@@ -2,8 +2,9 @@
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
+header('Cache-Control: no-store');
 
-$debugMode = isset($_GET['debug']) && $_GET['debug'] === '1';
+$debugMode = false; // Never expose transport diagnostics or credentials to clients.
 $settingsFetchDebug = [];
 
 function sendJsonAndExit(array $payload, int $statusCode = 200)
@@ -22,46 +23,35 @@ set_error_handler(function ($severity, $message, $file, $line) {
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
-set_exception_handler(function ($e) use ($debugMode) {
-    sendJsonAndExit([
-        'error' => 'API exception',
-        'message' => $e->getMessage(),
-        'file' => $debugMode ? $e->getFile() : null,
-        'line' => $debugMode ? $e->getLine() : null,
-        'type' => get_class($e),
-    ], 500);
+set_exception_handler(function ($error) {
+    // The cache wraps failures; preserve safe upstream diagnostics through that chain.
+    for ($cause = $error; $cause !== null; $cause = $cause->getPrevious()) {
+        if ($cause instanceof \Classes\UpstreamRequestException) {
+            if ($cause->httpStatus === 503) header('Retry-After: 30');
+            sendJsonAndExit(['error' => $cause->getMessage(), 'code' => $cause->reason], $cause->httpStatus);
+        }
+    }
+    error_log('Q-Finder lookup unavailable: ' . get_class($error));
+    header('Retry-After: 2');
+    sendJsonAndExit(['error' => 'Lookup temporarily unavailable. Please retry.'], 503);
 });
 
-register_shutdown_function(function () use ($debugMode) {
-    $error = error_get_last();
-    if ($error === null) {
-        return;
-    }
-
-    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
-    if (!in_array($error['type'], $fatalTypes, true)) {
-        return;
-    }
-
-    sendJsonAndExit([
-        'error' => 'API fatal error',
-        'message' => $error['message'],
-        'file' => $debugMode ? $error['file'] : null,
-        'line' => $debugMode ? $error['line'] : null,
-        'type' => $error['type'],
-    ], 500);
-});
-
-if (isset($_GET['health']) && $_GET['health'] === '1') {
-    sendJsonAndExit([
-        'ok' => true,
-        'phpVersion' => PHP_VERSION,
-        'file' => __FILE__,
-        'dir' => __DIR__,
-        'configExists' => file_exists(dirname(__DIR__) . '/config/config.php'),
-        'curlAvailable' => function_exists('curl_init'),
-        'allowUrlFopen' => (bool) ini_get('allow_url_fopen'),
-    ]);
+header('Access-Control-Allow-Headers: Authorization, Content-Type');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    header('Allow: GET, OPTIONS');
+    sendJsonAndExit(['error' => 'Method not allowed'], 405);
+}
+require_once dirname(__DIR__) . '/classes/security/apiToken.php';
+require_once dirname(__DIR__) . '/classes/MySqlCache.php';
+require_once dirname(__DIR__) . '/classes/UpstreamHttp.php';
+$token = \Classes\Security\ApiToken::bearer();
+if ($token === '') {
+    sendJsonAndExit(['error' => 'Authentication required.'], 401);
 }
 
 $configPath = dirname(__DIR__) . '/config/config.php';
@@ -73,6 +63,17 @@ if (!file_exists($configPath)) {
 }
 
 require_once $configPath;
+$user = \Classes\Security\ApiToken::fromConfig()->authenticate($token);
+if ($user === null) {
+    sendJsonAndExit(['error' => 'Session expired or revoked.'], 401);
+}
+
+function cachedUpstream(string $identity, int $ttl, callable $fetch, ?callable $isEmpty = null)
+{
+    static $cache;
+    $cache ??= \Classes\MySqlCache::fromConfig();
+    return $cache->remember($identity, $ttl, $fetch, $isEmpty);
+}
 
 function getDoi($q)
 {
@@ -91,289 +92,29 @@ function askOpenAlex($q)
         $openalexUrl = 'https://api.openalex.org/works?search=' . urlencode($q) . '&per-page=1';
     }
 
-    return requestPublicJson($openalexUrl);
+    return cachedUpstream('openalex:' . $openalexUrl,
+        defined('OPENALEX_CACHE_TTL_SECONDS') ? (int) OPENALEX_CACHE_TTL_SECONDS : 3600,
+        fn() => requestPublicJson($openalexUrl),
+        fn($data) => isset($data['results']) && $data['results'] === []);
 }
 
 function requestData($url, $apiKey)
 {
-    $ch = curl_init($url);
-    $verbose = fopen('php://temp', 'w+');
-
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HEADER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLINFO_HEADER_OUT => true,
-        CURLOPT_VERBOSE => true,
-        CURLOPT_STDERR => $verbose,
-        CURLOPT_HTTPHEADER => [
-            'Accept: application/json',
-            'X-ApiKey: ' . trim($apiKey),
-        ],
-    ]);
-
-    $raw = curl_exec($ch);
-
-    if ($raw === false) {
-        $errNo = curl_errno($ch);
-        $errMsg = curl_error($ch);
-        $sentHeaders = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-
-        rewind($verbose);
-        $verboseLog = stream_get_contents($verbose);
-        fclose($verbose);
-
-        curl_close($ch);
-
-        return [
-            'error' => 'cURL error',
-            'errno' => $errNo,
-            'message' => $errMsg,
-            'url' => $url,
-            'sentHeaders' => $sentHeaders ?: null,
-            'verbose' => substr($verboseLog ?: '', 0, 2000),
-        ];
-    }
-
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-    $sentHeaders = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-
-    $headers = substr($raw, 0, $headerSize);
-    $body = substr($raw, $headerSize);
-
-    rewind($verbose);
-    $verboseLog = stream_get_contents($verbose);
-    fclose($verbose);
-
-    curl_close($ch);
-
-    if ($httpCode < 200 || $httpCode >= 300) {
-        return [
-            'error' => 'Clarivate API error',
-            'status' => $httpCode,
-            'contentType' => $contentType,
-            'url' => $url,
-            'sentHeaders' => $sentHeaders,
-            'verbose' => substr($verboseLog ?: '', 0, 2000),
-            'headersPreview' => substr($headers, 0, 500),
-            'bodyPreview' => substr($body, 0, 500),
-        ];
-    }
-
-    if (!is_string($contentType) || stripos($contentType, 'application/json') === false) {
-        return [
-            'error' => 'Response is not JSON',
-            'status' => $httpCode,
-            'contentType' => $contentType,
-            'url' => $url,
-            'sentHeaders' => $sentHeaders,
-            'verbose' => substr($verboseLog ?: '', 0, 2000),
-            'headersPreview' => substr($headers, 0, 500),
-            'bodyPreview' => substr($body, 0, 500),
-        ];
-    }
-
-    $json = json_decode($body, true);
-
-    if (!is_array($json)) {
-        return [
-            'error' => 'Invalid JSON from Clarivate',
-            'status' => $httpCode,
-            'contentType' => $contentType,
-            'url' => $url,
-            'sentHeaders' => $sentHeaders,
-            'verbose' => substr($verboseLog ?: '', 0, 2000),
-            'headersPreview' => substr($headers, 0, 500),
-            'bodyPreview' => substr($body, 0, 500),
-        ];
-    }
-
-    return $json;
+    return cachedUpstream('clarivate:' . hash('sha256', $apiKey) . ':' . $url,
+        defined('WOS_CACHE_TTL_SECONDS') ? (int) WOS_CACHE_TTL_SECONDS : 86400,
+        fn() => requestClarivateJson($url, $apiKey),
+        fn($data) => isset($data['hits']) && $data['hits'] === []);
 }
 
-function tryDecodeJsonPayload($raw)
+function requestClarivateJson($url, $apiKey)
 {
-    $decoded = json_decode($raw, true);
-    if (is_array($decoded)) {
-        return $decoded;
-    }
-
-    $jsonStart = strpos($raw, '{');
-    $jsonEnd = strrpos($raw, '}');
-    if ($jsonStart === false || $jsonEnd === false || $jsonEnd < $jsonStart) {
-        return null;
-    }
-
-    $slice = substr($raw, $jsonStart, $jsonEnd - $jsonStart + 1);
-    $decoded = json_decode($slice, true);
-    return is_array($decoded) ? $decoded : null;
-}
-
-function requestJson($url)
-{
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 8,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => 0,
-        CURLOPT_USERAGENT => 'Q-Quartile-Widget/0.5.1',
-        CURLOPT_HTTPHEADER => [
-            'Accept: application/json',
-        ],
-    ]);
-
-    $raw = curl_exec($ch);
-    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-    $curlError = curl_error($ch);
-    curl_close($ch);
-
-    return [
-        'ok' => $raw !== false && $status >= 200 && $status < 300,
-        'status' => $status,
-        'contentType' => $contentType,
-        'curlError' => $curlError ?: null,
-        'rawPreview' => is_string($raw) ? substr($raw, 0, 500) : null,
-        'json' => is_string($raw) ? tryDecodeJsonPayload($raw) : null,
-    ];
+    return \Classes\UpstreamHttp::request($url, 'Clarivate', $apiKey);
 }
 
 function requestPublicJson($url)
 {
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 15,
-        CURLOPT_HTTPHEADER => [
-            'Accept: application/json',
-            'User-Agent: Q-Quartile-Widget/0.5.1',
-        ],
-    ]);
-
-    $raw = curl_exec($ch);
-    if ($raw === false) {
-        curl_close($ch);
-        return false;
-    }
-
-    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-    curl_close($ch);
-
-    if ($status < 200 || $status >= 300) {
-        return false;
-    }
-
-    if (!is_string($contentType) || stripos($contentType, 'application/json') === false) {
-        return false;
-    }
-
-    $decoded = json_decode($raw, true);
-    return is_array($decoded) ? $decoded : false;
-}
-
-function fetchUserSettingsFromBackend(?string $token): ?array
-{
-    global $settingsFetchDebug;
-
-    if (empty($token)) {
-        $settingsFetchDebug = [
-            'skipped' => true,
-            'reason' => 'missing-token',
-        ];
-        return [];
-    }
-
-    $url = 'https://imitweby.uhk.cz/widget/ajax/userSettings?' . http_build_query([
-        'token' => $token,
-    ]);
-
-    $response = requestJson($url);
-    $settingsFetchDebug = [
-        'url' => $url,
-        'ok' => $response['ok'],
-        'status' => $response['status'],
-        'contentType' => $response['contentType'],
-        'curlError' => $response['curlError'],
-        'rawPreview' => $response['rawPreview'],
-        'jsonKeys' => is_array($response['json']) ? array_keys($response['json']) : null,
-    ];
-
-    if (!$response['ok'] || !is_array($response['json'])) {
-        return null;
-    }
-
-    return is_array($response['json']['settings'] ?? null) ? $response['json']['settings'] : [];
-}
-
-function fetchUserSettingsFromDatabase(?string $token): ?array
-{
-    global $settingsFetchDebug;
-
-    if (empty($token)) {
-        return [];
-    }
-
-    $connection = @mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
-    if (!$connection) {
-        $settingsFetchDebug['dbConnectError'] = mysqli_connect_error();
-        return null;
-    }
-
-    mysqli_set_charset($connection, DB_CHARSET);
-
-    $sql = 'SELECT s.settings
-        FROM tSettings s
-        LEFT JOIN tUser u ON s.FK_userID = u.id
-        WHERE u.token = ?
-        LIMIT 1';
-
-    $statement = mysqli_prepare($connection, $sql);
-    if (!$statement) {
-        $settingsFetchDebug['dbPrepareError'] = mysqli_error($connection);
-        mysqli_close($connection);
-        return null;
-    }
-
-    mysqli_stmt_bind_param($statement, 's', $token);
-    mysqli_stmt_execute($statement);
-    mysqli_stmt_bind_result($statement, $rawSettings);
-    $fetched = mysqli_stmt_fetch($statement);
-
-    mysqli_stmt_close($statement);
-    mysqli_close($connection);
-
-    if (!$fetched || empty($rawSettings)) {
-        return [];
-    }
-
-    $decoded = json_decode($rawSettings, true);
-    return is_array($decoded) ? $decoded : [];
-}
-
-function fetchUserSettings(?string $token): array
-{
-    global $settingsFetchDebug;
-
-    $settings = fetchUserSettingsFromBackend($token);
-    if (is_array($settings)) {
-        $settingsFetchDebug['source'] = 'ajax';
-        return $settings;
-    }
-
-    $settings = fetchUserSettingsFromDatabase($token);
-    if (is_array($settings)) {
-        $settingsFetchDebug['source'] = 'db-fallback';
-        return $settings;
-    }
-
-    $settingsFetchDebug['source'] = 'none';
-    return [];
+    return \Classes\UpstreamHttp::request($url, 'OpenAlex',
+        defined('OPENALEX_API_KEY') ? OPENALEX_API_KEY : '');
 }
 
 function resolveSelectedItems(array $settings, string $group, array $map): array
@@ -655,32 +396,20 @@ function findBestJournalMetrics($issn, $preferredYear)
     return [$selectedJournal, null, null];
 }
 
-$q = isset($_GET['q']) ? trim($_GET['q']) : '';
+$q = is_string($_GET['q'] ?? null) ? trim($_GET['q']) : '';
+if (strlen($q) > 2000) {
+    sendJsonAndExit(['error' => 'Query is too long (maximum 2000 bytes).'], 400);
+}
 if ($q === '') {
     http_response_code(400);
     echo json_encode(['error' => 'Missing q parameter']);
     exit;
 }
 
-$token = isset($_GET['token']) ? trim($_GET['token']) : '';
-$userSettings = fetchUserSettings($token);
+$userSettings = $user['settings'];
 $displaySettings = buildDisplaySettings($userSettings);
 
 $workData = askOpenAlex($q);
-
-if (!$workData) {
-    echo json_encode([
-        'input' => $q,
-        'error' => 'OpenAlex request failed',
-        'displaySettings' => $displaySettings,
-        'userSettings' => $userSettings,
-        'settingsFetchDebug' => $debugMode ? $settingsFetchDebug : null,
-        'debug' => $debugMode ? [
-            'openAlexUrlType' => 'curl',
-        ] : null,
-    ]);
-    exit;
-}
 
 if (isset($workData['id'])) {
     $work = $workData;
@@ -725,7 +454,7 @@ if (!empty($qData['ranks']['jif'][0]['quartile'])) {
 }
 
 $response = [
-    'isWoS' => $q == $articleTitle,
+    'isWoS' => isQDataAvailable($qData), // Journal metrics availability, not article indexing evidence.
     'input' => $q,
     'articleTitle' => $articleTitle,
     'doi' => $work['ids']['doi'] ?? getDoi($q),
